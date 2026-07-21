@@ -36,11 +36,11 @@ logger = logging.getLogger()
 # SILENCE THE NOISE: This stops Flask/Waitress from logging every web request
 logging.getLogger('werkzeug').setLevel(logging.ERROR)
 
-VT_API_KEY = "745bbaff469795415f445a28fe9f190fc7c811a57c7ae691b6ebbf2321dba334"
-MISP_URL = "https://192.168.3.130/attributes/restSearch"
-MISP_API_KEY = "RTvBLJwibCczPIyv9yzYaznJvdD5KzKQPkR8SZex"
-#ABUSE_IPDB_KEY = "0b07ba809025804adfa4d99310ecae273ea4cfd7307df5ba87a00209504b21275ec57c269b1416ba"
-ABUSE_IPDB_KEY = "d968456f02d8c395eeb4ca057ef31ed5bdac0bb1613dc2c0e201d8a32bab794851cb788de5469629"
+VT_API_KEY = "add your own key"
+MISP_URL = "add your own machine url"
+MISP_API_KEY = "add your own key"
+#ABUSE_IPDB_KEY = "add your own key"
+ABUSE_IPDB_KEY = "add your own key"
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CERT_FILE = os.path.join(BASE_DIR, 'server.crt')
 KEY_FILE = os.path.join(BASE_DIR, 'server.key')
@@ -192,7 +192,7 @@ def init_db():
     except: pass # Already exists
     conn.execute('CREATE TABLE IF NOT EXISTS two_factor (username TEXT PRIMARY KEY, code TEXT, expiry TIMESTAMP)')
     # Pre-save your credentials
-    conn.execute('INSERT OR IGNORE INTO users (username, password) VALUES (?, ?)', ('usman', '12121234@Usman'))
+    conn.execute('INSERT OR IGNORE INTO users (username, password) VALUES (?, ?)', ('name', 'own password'))
     conn.commit()
     conn.close()
 
@@ -260,10 +260,6 @@ def query_nvd_for_app(app_name, app_version):
         logger.error(f"NVD API Error for {app_name}: {e}")
     
     return []
-#def send_2fa_email(receiver_email, code):
- #   sender_email = "uusmanzammad@gmail.com"
-    # Ensure this is your 16-character App Password (no spaces)
-  #  password = "ifmu maah sgoz wbad" 
 
     # Clean the receiver email just in case
    # receiver_email = receiver_email.strip()
@@ -581,7 +577,7 @@ class EDRServicer(edr_pb2_grpc.EDRServiceServicer):
         conn.close()
         
         # 3. Assign Variables with safe defaults
-        db_pass = db_conf.get("shutdown_password", "ONPL@1234")
+        db_pass = db_conf.get("shutdown_password", "")
         scan_time = db_conf.get("fleet_scan_time", "14:00")
         emergency_p = db_conf.get("emergency_password", "EDR_Lock_99!")
         is_remediate = (db_conf.get("auto_remediate") == "ON")
@@ -1348,7 +1344,7 @@ def request_deactivate(aid):
     DEACTIVATION_PINS[aid] = {"pin": pin, "expiry": time.time() + 300}
     
     # Send to YOUR email
-    if send_security_email("usman55340@gmail.com", pin, aid):
+    if send_security_email("own email", pin, aid):
         log_manager(f"SHIELD: Deactivation PIN generated and emailed for {aid}")
         return redirect(url_for('home', view='summary', deact_pending=aid))
     else:
@@ -1397,7 +1393,7 @@ def login():
 
             # 3. Send Email using your existing credentials
             # Subject changed to 'Login Verification'
-            email_sent = send_security_email("usman55340@gmail.com", code, "MANAGER_LOGIN")
+            email_sent = send_security_email("own email", code, "MANAGER_LOGIN")
             
             if email_sent:
                 logger.info(f"[AUTH] 2FA Code sent to admin for user: {username}")
