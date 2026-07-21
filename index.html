@@ -1,0 +1,2384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"><title>EDR DEFENDER</title>
+<style>
+    :root { 
+        --bg: #000000; 
+        --side: #050808; 
+        --border: #1a1a1a; 
+        --accent-green: #39ff14; 
+        --accent-blue: #00f2ff;  
+        --accent-purple: #bf5af2; /* Deep Cyber Purple */
+        --text: #c9d1d9; 
+        --red: #f85149; 
+        --green: #3fb950; 
+        --orange: #d29922;
+
+        /* THREAD-THIN GRID COLORS */
+        --grid-blue: rgba(0, 242, 255, 0.08);   /* Glowing Blue Line */
+        --grid-purple: rgba(191, 90, 242, 0.08); /* Glowing Purple Line */
+
+        /* NEBULA GLOW: Mixture of Blue and Purple over pure Black */
+        --mixed-glow: radial-gradient(circle at center, 
+            rgba(0, 242, 255, 0.15) 0%, 
+            rgba(191, 90, 242, 0.1) 50%, 
+            #000000 100%);
+
+    body { 
+        font-family: 'Segoe UI', sans-serif; 
+        margin: 0; 
+        display: flex; 
+        height: 100vh; 
+        overflow: hidden;
+        background-color: var(--bg);
+
+        /* 35px GRID SIZE: Perfectly aligned Blue and Purple lines */
+        background-image: 
+            linear-gradient(var(--grid-blue) 1px, transparent 1px), 
+            linear-gradient(90deg, var(--grid-purple) 1px, transparent 1px), 
+            var(--mixed-glow);
+        background-size: 35px 35px, 35px 35px, 100% 100%;
+        background-attachment: fixed;
+        color: var(--text);
+    }
+
+    /* Extra Polish: Ensure panels match the new glow */
+    .panel, .stat-card { 
+        background: rgba(10, 12, 12, 0.85); 
+        border: 1px solid rgba(191, 90, 242, 0.2); /* Soft purple border */
+        backdrop-filter: blur(8px);
+        animation: nebulaPulse 5s infinite alternate;
+    }
+
+    @keyframes nebulaPulse {
+        from { border-color: rgba(191, 90, 242, 0.2); box-shadow: 0 0 10px rgba(0,0,0,0.5); }
+        to { border-color: rgba(0, 242, 255, 0.3); box-shadow: 0 0 20px rgba(0, 242, 255, 0.1); }
+    }
+
+  /* --- MIDNIGHT NEBULA SIDEBAR THEME --- */
+.sidebar { 
+    width: 300px; 
+    /* Gradient: Deep Black -> Midnight Purple -> Dark Tactical Blue */
+    background: linear-gradient(180deg, #050808 0%, #0d001a 40%, #00141a 100%);
+    border-right: 1px solid rgba(0, 242, 255, 0.2); 
+    padding: 20px; 
+    display: flex; 
+    flex-direction: column; 
+    overflow-y: auto; 
+    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.7);
+    position: relative;
+}
+
+/* Updated Stat Boxes to look like glowing glass */
+.stat-box { 
+    flex: 1; 
+    background: rgba(20, 20, 20, 0.6); /* Semi-transparent */
+    border: 1px solid rgba(255, 255, 255, 0.1); 
+    padding: 12px; 
+    border-radius: 8px; 
+    text-align: center; 
+    backdrop-filter: blur(10px); /* Blur behind the box */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    transition: 0.3s;
+}
+
+/* Individual accent glows for the bottom of the boxes */
+.stat-box:nth-child(1) { border-bottom: 2px solid #58a6ff; } /* Total - Blue */
+.stat-box:nth-child(2) { border-bottom: 2px solid var(--accent-green); } /* Live - Green */
+.stat-box:nth-child(3) { border-bottom: 2px solid var(--red); } /* Down - Red */
+
+.stat-box:hover {
+    transform: translateY(-2px);
+    background: rgba(30, 30, 30, 0.8);
+    border-color: var(--accent-blue);
+}
+
+.stat-label { 
+    font-size: 0.75em; 
+    color: #8b949e; 
+    text-transform: uppercase; 
+    letter-spacing: 1px;
+}
+
+.stat-number { 
+    font-size: 1.6em; 
+    font-weight: bold; 
+    margin-top: 5px; 
+    display: block;
+}
+
+/* The divider line at the bottom */
+hr {
+    border: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(0, 242, 255, 0.3), transparent);
+    margin: 20px 0;
+}
+
+/* User Info Section Styling */
+.user-info {
+    font-size: 0.85em;
+    color: #8b949e;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 6px;
+}
+
+   .main { 
+        flex: 1; 
+        padding: 20px; /* Reduced from 30px */
+        overflow-y: auto; 
+    }
+    
+    /* Stats and Panels with Glassmorphism and Glow */
+     .panel, .stat-card { 
+        background: rgba(15, 17, 17, 0.85); 
+        padding: 15px; /* Reduced from 20px */
+        border-radius: 8px; 
+        border: 1px solid rgba(57, 255, 20, 0.2); 
+        margin-bottom: 15px; /* Reduced from 25px */
+        backdrop-filter: blur(5px);
+        animation: subtleGlow 4s infinite alternate;
+    }
+	
+	.chart-container {
+        position: relative;
+        height: 220px; /* Small fixed height for compact look */
+        width: 100%;
+    }
+
+    @keyframes subtleGlow {
+        from { border-color: rgba(57, 255, 20, 0.2); box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); }
+        to { border-color: rgba(0, 242, 255, 0.3); box-shadow: 0 0 20px rgba(0, 242, 255, 0.1); }
+    }
+
+    .stat-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 25px; }
+    .stat-card { padding: 15px; margin-bottom: 0; }
+    .stat-val { 
+    font-size: 1.4em; 
+    font-weight: bold; 
+    display: block; 
+    /* text-shadow removed to stop the glow */}
+    
+    .nav-btn { display: block; width: 100%; padding: 12px; margin: 5px 0; background: none; border: 1px solid transparent; color: var(--text); text-align: left; cursor: pointer; text-decoration: none; border-radius: 6px; transition: 0.3s; }
+    .nav-btn:hover { background: rgba(33, 38, 45, 0.7); color: var(--accent-blue); }
+    .nav-active { background: #21262d; border-color: var(--accent-blue); color: var(--accent-blue); box-shadow: 0 0 10px rgba(0, 242, 255, 0.2); }
+
+    /* Progress Bar logic */
+    .progress-container { display: none; background: rgba(28, 33, 40, 0.9); border: 1px solid var(--accent-blue); padding: 15px; border-radius: 8px; margin-bottom: 25px; }
+    .progress-bg { background: #000; height: 14px; border-radius: 10px; overflow: hidden; margin: 10px 0; border: 1px solid #333; }
+    .progress-fill { background: linear-gradient(90deg, var(--accent-green), var(--accent-blue)); height: 100%; width: 0%; transition: width 0.4s ease; }
+
+    /* Tables */
+    table { width: 100%; border-collapse: collapse; background: rgba(0, 0, 0, 0.3); border-radius: 8px; overflow: hidden; }
+    th, td { padding: 12px; border-bottom: 1px solid var(--border); text-align: left; }
+    th { background: rgba(33, 38, 45, 0.9); color: var(--accent-blue); text-transform: uppercase; font-size: 0.8em; letter-spacing: 1px; }
+    
+    /* Specific Alert Colors */
+    .row-FILE_PROTECTION, .row-MEM_KILL, .row-USB_BLOCK, .row-THREAT_INTEL { color: var(--red) !important; font-weight: bold; }
+    .row-BEHAVIOR { color: #ffdd00 !important; font-weight: bold; border-left: 5px solid #ffdd00; }
+    .row-REGISTRY { color: #bf5af2 !important; font-weight: bold; border-left: 5px solid #bf5af2; }
+    .row-RANSOMWARE { color: #ff007f !important; font-weight: bold; background: rgba(255, 0, 127, 0.05); border-left: 5px solid #ff007f; }
+    .row-POLICY_VIOLATION { color: #00eeff !important; font-weight: bold; border-left: 5px solid #00eeff; }
+    .row-ISOLATION { color: #ff2d55 !important; font-weight: bold; border-left: 5px solid #ff2d55; background: rgba(255, 45, 85, 0.05); }
+    .row-RESTORATION { color: #00e5ff !important; font-weight: bold; border-left: 5px solid #00e5ff; background: rgba(0, 229, 255, 0.05); }
+    .row-USB_WHITELIST { color: #39ff14 !important; font-weight: bold; border-left: 5px solid #39ff14; background: rgba(57, 255, 20, 0.05); }
+	.row-COMPROMISE { color: #ff00ff !important; font-weight: bold; border-left: 5px solid #ff00ff; background: rgba(255, 0, 255, 0.1); }
+	.row-VULNERABILITY { color: #ffb6c1 !important; /* Light Pink for Low/Med */border-left: 4px solid #ffb6c1; }
+	.row-USER_CREATED, .row-USER_ENABLED, .row-PASS_RESET { color: #39ff14 !important; } /* Green for creation */
+    .row-PRIVILEGE_ESC, .row-IDENTITY_TAMPER { color: #ff007f !important; font-weight: bold; border-left: 5px solid #ff007f; } /* Neon Pink for High Risk */
+    .row-USER_DELETED, .row-GROUP_REMOVAL { color: var(--orange) !important; }
+	.row-NETWORK { 
+    color: #ff8fa3 !important; /* Light Red/Pink */
+    font-weight: bold; 
+    border-left: 5px solid #ff8fa3; 
+    background: rgba(255, 143, 163, 0.05); 
+}
+.row-CRITICAL_REMEDIATION { 
+    color: #ff3131 !important; 
+    font-weight: bold; 
+    border-left: 6px solid #ff3131; 
+    background: rgba(255, 49, 49, 0.1); 
+    animation: criticalPulse 2s infinite;
+}
+
+@keyframes criticalPulse {
+    0% { background: rgba(255, 49, 49, 0.1); }
+    50% { background: rgba(255, 49, 49, 0.2); }
+    100% { background: rgba(255, 49, 49, 0.1); }
+}
+.row-NETWORK_CRITICAL { 
+    color: var(--red) !important; 
+    font-weight: bold; 
+    border-left: 5px solid var(--red); 
+    background: rgba(248, 81, 73, 0.1); 
+}
+/* --- IDENTITY ALERT COLORS --- */
+
+/* 1. User Created (Green) */
+.row-USER_CREATED { 
+    color: #39ff14 !important; 
+    border-left: 5px solid #39ff14; 
+}
+
+/* 2. User Added to Admin (Pink) */
+.row-PRIVILEGE_ESC { 
+    color: #ff007f !important; 
+    font-weight: bold; 
+    border-left: 5px solid #ff007f; 
+    background: rgba(255, 0, 127, 0.05);
+}
+
+/* 3. User Deleted (Orange) */
+.row-USER_DELETED { 
+    color: var(--orange) !important; 
+    border-left: 5px solid var(--orange); 
+}
+
+/* 4. Admin User Removed from Group (Red) */
+.row-ADMIN_REMOVAL { 
+    color: var(--red) !important; 
+    font-weight: bold; 
+    border-left: 5px solid var(--red); 
+    background: rgba(248, 81, 73, 0.1);
+}
+
+/* General ID Updates */
+.row-PASS_RESET { color: var(--accent-blue) !important; }
+    .dot { height: 10px; width: 10px; border-radius: 50%; display: inline-block; margin-right: 8px; }
+    .dot-Active { background: var(--accent-green); box-shadow: 0 0 10px var(--accent-green); } 
+    .dot-Inactive { background: var(--red); }
+
+    /* Modal / Popup */
+    .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); }
+    .modal-content { background: var(--side); margin: 5% auto; padding: 25px; border: 1px solid var(--accent-blue); width: 650px; border-radius: 12px; box-shadow: 0 0 30px #000; }
+    .file-list { max-height: 400px; overflow-y: auto; background: #000; padding: 10px; border-radius: 5px; border: 1px solid #222; }
+    .file-item { padding: 10px; border-bottom: 1px solid #111; display: flex; justify-content: space-between; align-items: center; transition: 0.2s; }
+    .file-item:hover { background: rgba(0, 242, 255, 0.1); }
+
+    /* Terminal */
+    /*.terminal { background: #000; color: var(--accent-green); font-family: 'Consolas', monospace; padding: 15px; height: 450px; overflow-y: auto; border: 1px solid var(--accent-green); box-shadow: inset 0 0 10px rgba(57, 255, 20, 0.2); font-size: 0.9em; }*/
+	.terminal { 
+    background: rgba(0, 0, 0, 0.4); /* Slightly darker for better contrast with white text */
+    color: #ffffff; /* Main text changed to WHITE */
+    font-family: 'Cascadia Code', 'JetBrains Mono', 'Consolas', monospace; 
+    padding: 25px; 
+    height: 700px; /* Panel made LONGER */
+    overflow-y: auto; 
+    border: 1px solid var(--accent-blue); /* Border changed to BLUE */
+    box-shadow: 0 0 20px rgba(0, 242, 255, 0.2), inset 0 0 15px rgba(0, 242, 255, 0.1); 
+    backdrop-filter: blur(0px);
+    font-size: 1.05em; 
+    line-height: 1.6;
+    letter-spacing: 0.5px;
+}
+
+/* Custom scrollbar to match the blue theme */
+.terminal::-webkit-scrollbar { width: 8px; }
+.terminal::-webkit-scrollbar-thumb { background: var(--accent-blue); border-radius: 4px; }
+.terminal::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); }
+
+/* Blinking cursor in Blue */
+.cursor-blue {
+    border-left: 8px solid var(--accent-blue); 
+    margin-left: 5px; 
+    animation: blink 1s infinite;
+}
+    
+    /* Inputs & Buttons */
+    input, select, button { padding: 10px; background: #000; color: white; border: 1px solid #333; border-radius: 5px; margin-bottom: 10px; width: 100%; box-sizing: border-box; outline: none; }
+    input:focus { border-color: var(--accent-blue); }
+    button { 
+        background: linear-gradient(45deg, #2ebf12, #008c95); 
+        border: none; 
+        color: white; 
+        font-weight: bold; 
+        cursor: pointer; 
+        transition: 0.3s;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    button:hover { filter: brightness(1.2); transform: translateY(-1px); box-shadow: 0 0 15px var(--accent-blue); }
+	/* BACKGROUND WATERMARK LOGO */
+.main::before {
+    content: "";
+    position: fixed;
+    top: 55%;        /* Centered vertically */
+    left: 60%;       /* Centered horizontally in the main area */
+    transform: translate(-50%, -50%);
+    width: 900px;    /* Adjust size as needed */
+    height: 900px;
+    /* Replace the filename below with your logo's actual filename */
+    background-image: url("{{ url_for('static', filename='image3s.png') }}");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    opacity: 0.08;   /* This controls the transparency (0.01 to 0.1 recommended) */
+    z-index: 0;      /* Keeps it behind the table */
+    pointer-events: none; /* Prevents it from blocking clicks */
+}
+
+/* Ensure the main container allows the watermark to show behind it */
+.main {
+    position: relative;
+    z-index: 1;
+}
+
+table, .panel, .stat-card {
+    position: relative;
+    z-index: 2; /* Keeps text and buttons above the logo */
+}
+.stat-container { display: flex; gap: 15px; margin-bottom: 25px; }
+.stat-box { 
+    flex: 1; 
+    background: #1c2128; 
+    border: 1px solid var(--border); 
+    padding: 15px; 
+    border-radius: 8px; 
+    text-align: center; 
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+.stat-label { font-size: 0.8em; color: #8b949e; text-transform: uppercase; display: block; }
+.stat-number { font-size: 1.8em; font-weight: bold; margin-top: 5px; display: block; }
+
+/* Orange Hardware Progress Bars */
+.hw-progress-bg { background: #111; height: 12px; border-radius: 6px; overflow: hidden; border: 1px solid #333; margin: 8px 0; }
+.hw-progress-fill { 
+    background: linear-gradient(90deg, #ff9f0a, #ff6b00); 
+    height: 100%; 
+    transition: width 0.8s ease-in-out; 
+    box-shadow: 0 0 10px rgba(255, 159, 10, 0.4);
+}
+.panel::-webkit-scrollbar, .main::-webkit-scrollbar {
+    width: 8px;  /* Vertical width */
+    height: 8px; /* Horizontal height */
+}
+
+.panel::-webkit-scrollbar-track, .main::-webkit-scrollbar-track {
+    background: #050808;
+    border-radius: 10px;
+}
+
+.panel::-webkit-scrollbar-thumb, .main::-webkit-scrollbar-thumb {
+    background: var(--accent-blue);
+    border-radius: 10px;
+    box-shadow: 0 0 10px var(--accent-blue);
+}
+
+.panel::-webkit-scrollbar-thumb:hover, .main::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-green);
+}
+
+/* Ensure the panel allows scrolling as marked in your image */
+.panel {
+    overflow: auto; /* Enables both vertical and horizontal scroll */
+}
+/* CIS Category Header Bar */
+.cis-category-bar {
+    background: #0d1117;
+    color: var(--accent-green); /* Glowing Green */
+    padding: 12px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+    border: 1px solid #333;
+    font-weight: bold;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    transition: 0.3s;
+    border-left: 4px solid var(--accent-green);
+}
+
+.cis-category-bar:hover {
+    background: #161b22;
+    box-shadow: 0 0 15px rgba(57, 255, 20, 0.1);
+}
+
+.cis-category-bar span.arrow {
+    font-size: 0.8em;
+    transition: transform 0.3s;
+}
+
+/* For rotation of the arrow */
+.active-header .arrow {
+    transform: rotate(180deg);
+}
+
+/* Hide the table by default */
+.cis-content-table {
+    display: table; /* We will use JS to toggle this */
+    width: 100%;
+    margin-top: 2px;
+}
+/* Ensure these match your Image 1 sidebar blocks */
+.posture-container { display: flex; gap: 15px; margin-bottom: 25px; }
+.posture-box { 
+    flex: 1; 
+    background: rgba(15, 17, 17, 0.4); /* More transparent */
+    border: 1px solid rgba(255, 255, 255, 0.05); 
+    padding: 15px; /* Smaller padding makes boxes smaller */
+    border-radius: 8px; 
+    text-align: center; 
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    border-bottom: 3px solid transparent;
+    transition: 0.3s;
+}
+.posture-box:hover { transform: translateY(-3px); border-color: var(--accent-blue); }
+
+/* Colors for the 4 Blocks */
+.comp-green { color: var(--accent-green); border-bottom-color: var(--accent-green); }
+.comp-red { color: var(--red); border-bottom-color: var(--red); }
+.comp-blue { color: var(--accent-blue); border-bottom-color: var(--accent-blue); }
+.comp-orange { color: var(--orange); border-bottom-color: var(--orange); }
+/* --- BLUE CYBER SCROLLBAR FOR SIDEBAR --- */
+/* This handles both the vertical and the horizontal (bottom) slider */
+.sidebar::-webkit-scrollbar {
+    width: 6px;  /* Vertical width */
+    height: 6px; /* Horizontal height (The bottom slider) */
+}
+
+.sidebar::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.3); /* Dark track to make blue pop */
+    border-radius: 10px;
+}
+
+
+
+/* Ensure sidebar content doesn't hide the horizontal scrollbar */
+/* --- MASTER "NEBULA" SIDEBAR THEME --- */
+.sidebar { 
+    width: 300px; 
+    /* Gradient matching the button: Deep Purple -> Black -> Deep Blue */
+    background: linear-gradient(180deg, 
+        rgba(26, 0, 51, 0.8) 0%,   /* Dark Purple */
+        rgba(0, 0, 0, 0.9) 50%,    /* Solid Black */
+        rgba(0, 11, 26, 0.8) 100%  /* Deep Blue */
+    );
+    
+    /* Glass Effect */
+    backdrop-filter: blur(20px); 
+    -webkit-backdrop-filter: blur(20px);
+    
+    /* Glowing Purple-Blue Border */
+    border-right: 1px solid rgba(191, 90, 242, 0.3); 
+    padding: 20px; 
+    display: flex; 
+    flex-direction: column; 
+    overflow-y: auto; 
+    overflow-x: auto; 
+    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.8);
+}
+
+/* --- THE MATCHING SLIDER (SCROLLBAR) --- */
+/* This makes the slider look like the glowing edge of the button */
+.sidebar::-webkit-scrollbar {
+    width: 3px;  
+    height: 3px; /* The horizontal slider size */
+}
+
+.sidebar::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+    /* Gradient slider matching your button theme */
+    background: linear-gradient(to right, #bf5af2, var(--accent-blue));
+    border-radius: 10px;
+    /* Neon Glow */
+    box-shadow: 0 0 10px rgba(0, 242, 255, 0.6);
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+    background: #ffffff;
+    box-shadow: 0 0 15px #ffffff;
+}
+
+/* --- MATCHING STAT BOXES --- */
+.stat-box { 
+    flex: 1; 
+    background: rgba(10, 10, 15, 0.4); 
+    border: 1px solid rgba(191, 90, 242, 0.2); /* Purple border */
+    padding: 12px; 
+    border-radius: 8px; 
+    text-align: center; 
+    transition: 0.3s;
+}
+
+/* Change sidebar buttons to glow blue on hover like the button text */
+.nav-btn:hover {
+    background: rgba(0, 242, 255, 0.05);
+    color: #ffffff;
+    text-shadow: 0 0 10px var(--accent-blue);
+}
+/* "Midnight Nebula" Cyber-Intel Button */
+.intel-btn {
+    /* Gradient from Deep Purple to Cyber Blue over a Black base */
+    background: linear-gradient(135deg, #1a0033 0%, #000b1a 50%, #004d66 100%);
+    color: var(--accent-blue) !important; /* Cyan text */
+    text-decoration: none;
+    padding: 12px 25px;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    width: auto;
+    font-weight: bold;
+    border-radius: 6px;
+    /* Subtle Purple border */
+    border: 1px solid rgba(191, 90, 242, 0.4); 
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-size: 0.85em;
+    cursor: pointer;
+    transition: all 0.4s ease;
+    /* Deep blue/purple glow */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.8), 
+                0 0 10px rgba(88, 166, 255, 0.1),
+                inset 0 0 5px rgba(191, 90, 242, 0.2);
+}
+
+.intel-btn:hover {
+    transform: translateY(-2px) scale(1.02);
+    /* Shifting to a more vibrant Blue/Purple on hover */
+    background: linear-gradient(135deg, #2d004d 0%, #001f3f 100%);
+    color: #fff !important;
+    border-color: var(--accent-blue);
+    /* Stronger neon blue glow */
+    box-shadow: 0 0 20px rgba(0, 242, 255, 0.4), 
+                0 0 40px rgba(191, 90, 242, 0.2);
+    letter-spacing: 2.5px;
+}
+
+.intel-btn .icon {
+    font-size: 1.1em;
+    /* Icon glows blue */
+    filter: drop-shadow(0 0 5px var(--accent-blue));
+    transition: 0.3s;
+}
+
+.intel-btn:hover .icon {
+    transform: rotate(-15deg) scale(1.2);
+}
+/* "Midnight Nebula" C2 Button */
+.c2-btn {
+    /* Gradient: Deep Purple -> Deep Black -> Dark Blue */
+    background: linear-gradient(135deg, #1a0033 0%, #050505 50%, #002b36 100%);
+    color: var(--accent-blue) !important;
+    text-decoration: none;
+    padding: 12px 25px;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    width: auto;
+    font-weight: bold;
+    border-radius: 6px;
+    /* Neon Cyan border with lower opacity */
+    border: 1px solid rgba(0, 242, 255, 0.3);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-size: 0.85em;
+    cursor: pointer;
+    transition: all 0.4s ease;
+    /* Combined Glow: Purple shadow + Blue inset */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.9), 
+                0 0 12px rgba(191, 90, 242, 0.15),
+                inset 0 0 8px rgba(0, 242, 255, 0.1);
+}
+
+.c2-btn:hover {
+    transform: translateY(-2px) scale(1.02);
+    /* Shifts to a deeper Blue-Purple mix on hover */
+    background: linear-gradient(135deg, #2d004d 0%, #001a33 100%);
+    color: #ffffff !important;
+    border-color: var(--accent-green); /* Turns Green on edge to show "Active" */
+    box-shadow: 0 0 25px rgba(57, 255, 20, 0.3), 
+                0 0 50px rgba(0, 242, 255, 0.15);
+    letter-spacing: 2.5px;
+}
+
+.c2-btn .icon {
+    font-size: 1.2em;
+    filter: drop-shadow(0 0 5px var(--accent-blue));
+    transition: 0.5s ease-in-out;
+}
+
+/* Satellite spin effect on hover */
+.c2-btn:hover .icon {
+    transform: rotate(360deg);
+}
+/* --- RIGHT SIDE PANEL: NEBULA THEME --- */
+.nebula-side-panel {
+    position: fixed;
+    top: 0;
+    right: -480px; /* Hidden off-screen to the right */
+    width: 450px;
+    height: 100vh;
+    background: rgba(5, 8, 8, 0.98);
+    backdrop-filter: blur(20px);
+    border-left: 2px solid var(--accent-purple); 
+    box-shadow: -15px 0 50px rgba(0, 0, 0, 0.9); 
+    z-index: 3000;
+    transition: right 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.nebula-side-panel.active {
+    right: 0;
+}
+
+/* --- THE RESULT CARDS (Image 1 Style) --- */
+.agent-result-card {
+    background: rgba(20, 20, 25, 0.5);
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-left: 4px solid var(--accent-blue);
+}
+
+.agent-name-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    color: var(--accent-blue);
+}
+
+/* --- THE GREEN TERMINAL BOX (Image 1 Style) --- */
+.result-terminal {
+    background: #000;
+    color: #39ff14; /* Neon Green from Image 1 */
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 0.85em;
+    padding: 12px;
+    border-radius: 4px;
+    max-height: 250px; /* Limits height like Image 1 */
+    overflow-y: auto;
+    overflow-x: auto;
+    white-space: pre; /* Keeps the table formatting straight */
+    border: 1px solid #222;
+}
+
+/* Use the thin purple slider for these boxes too */
+.result-terminal::-webkit-scrollbar { width: 4px; height: 4px; }
+.result-terminal::-webkit-scrollbar-thumb { background: #bf5af2; border-radius: 10px; }
+</style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<div class="sidebar">
+    <div style="display:flex; align-items:center; gap:12px; margin-bottom:25px;">
+        <img src="{{ url_for('static', filename='image3s.png') }}" style="width:85px; height:75px; border-radius:8px;">
+        <h2 style="margin:0; font-size:1.3em; color:var(--accent)">ONE EDR DEFENDER</h2>
+    </div>
+
+    <div class="stat-grid">
+        <div class="stat-card">Total<br><span class="stat-val">{{ total }}</span></div>
+        <div class="stat-card" style="color:var(--green)">Live<br><span class="stat-val">{{ active }}</span></div>
+        <div class="stat-card" style="color:var(--red)">Down<br><span class="stat-val">{{ inactive }}</span></div>
+    </div>
+
+    <a href="/?view=alerts" class="nav-btn {{ 'nav-active' if view == 'alerts' }}"> Security Events</a>
+    <a href="/?view=event_details" class="nav-btn {{ 'nav-active' if view == 'event_details' }}"> Event Details</a>
+    <a href="/?view=summary" class="nav-btn {{ 'nav-active' if view == 'summary' }}"> Endpoint Summary</a>
+    <a href="/?view=active_scan" class="nav-btn {{ 'nav-active' if view == 'active_scan' }}"> Active Scan</a>
+    <a href="/?view=usb" class="nav-btn {{ 'nav-active' if view == 'usb' }}"> USB Whitelist</a>
+    <a href="/?view=policy" class="nav-btn {{ 'nav-active' if view == 'policy' }}"> App Blocklist</a>
+    <a href="/?view=logs" class="nav-btn {{ 'nav-active' if view == 'logs' }}"> Manager Logs</a>
+	<a href="/?view=shell&shell_agent={{ agents[0][0] if agents else '' }}" class="nav-btn {{ 'nav-active' if view == 'shell' }}"> Remote Shell</a>
+    <a href="/?view=rules" class="nav-btn {{ 'nav-active' if view == 'rules' }}">⚖️ Operational Rules</a>
+   <!-- Replace your bottom sidebar div with this -->
+<div style="margin-top: auto; padding-top: 15px; border-top: 2px solid rgba(191, 90, 242, 0.3); position: relative;">
+    <div style="padding: 0 15px 10px 15px; font-size: 0.85em; color: #8b949e; line-height: 1.6;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <div><span style="margin-left: 5px;">User:</span> <span style="color: var(--accent);">{{ session.get('user') }}</span></div>
+                <div><span style="margin-left: 5px;">Version:</span> <span style="color: #666;">{{ version }}</span></div>
+            </div>
+            <!-- THE SETTINGS ICON -->
+            <a href="/?view=settings" title="Manager Settings" style="text-decoration: none; font-size: 1.4em; transition: 0.3s; color: {{ 'var(--accent)' if view == 'settings' else '#444' }};">
+                ⚙️
+            </a>
+        </div>
+    </div>
+    <a href="/restart_manager" class="nav-btn" style="color: var(--orange); margin: 0; padding-top: 5px;" onclick="return confirm('Restart the EDR Manager?')">
+         <span style="margin-left: 8px;">Restart Manager</span>
+    </a>
+    <a href="/logout" class="nav-btn" style="color: var(--red); margin: 0; padding-top: 10px;">
+         <span style="margin-left: 8px;">Logout</span>
+    </a>
+</div>
+</div>
+
+<div class="main">
+    {% if view == 'alerts' %}
+        <h2>Security Events (PKT)</h2>
+		<div class="posture-container" style="margin-bottom: 30px;">
+        <div class="posture-box comp-blue">
+            <span class="posture-label">INFO EVENTS</span>
+            <span class="posture-number">{{ sev_counts.info }}</span>
+        </div>
+        <div class="posture-box comp-green">
+            <span class="posture-label">LOW RISK</span>
+            <span class="posture-number">{{ sev_counts.low }}</span>
+        </div>
+        <div class="posture-box comp-orange">
+            <span class="posture-label">MEDIUM RISK</span>
+            <span class="posture-number">{{ sev_counts.med }}</span>
+        </div>
+        <div class="posture-box comp-red">
+            <span class="posture-label">CRITICAL/HIGH</span>
+            <span class="posture-number">{{ sev_counts.high }}</span>
+        </div>
+        </div>
+        <form method="GET" style="display:flex; gap:10px; margin-bottom:20px; align-items:center;">
+            <input type="hidden" name="view" value="alerts">
+            <input type="text" name="search" placeholder="Search..." value="{{ search }}" style="flex:3;">
+            <select name="time" style="flex:1;">
+                <option value="all" {% if time_f == 'all' %}selected{% endif %}>All Time</option>
+                <option value="5m" {% if time_f == '5m' %}selected{% endif %}>5 Mins</option>
+                <option value="10m" {% if time_f == '10m' %}selected{% endif %}>10 Mins</option>
+                <option value="1h" {% if time_f == '1h' %}selected{% endif %}>1 Hour</option>
+                <option value="24h" {% if time_f == '24h' %}selected{% endif %}>24 Hours</option>
+				 <option value="7d" {% if time_f == '7d' %}selected{% endif %}>Last 7 Days</option>
+            </select>
+            <button type="submit" style="width:120px;">FILTER</button>
+        </form>
+        <table>
+            <thead><tr><th>Timestamp</th><th>Agent</th><th>Type</th><th>Object</th><th>Action</th></tr></thead>
+            <tbody>
+                <!--{% for a in alerts %}<tr class="row-{{ a[2] }}"><td>{{ a[5] }}</td><td>{{ a[1] }}</td><td>{{ a[2] }}</td><td>{{ a[4] }}</td><td>{{ a[3] }}</td></tr>{% endfor %}-->
+				<!-- Inside your Alerts Table <tbody> -->
+{% for a in alerts %}
+<tr class="row-{{ a[2] }}">
+    <td>{{ a[5] }}</td>
+    <td>{{ a[1] }}</td>
+    <td>{{ a[2] }}</td>
+    <td>{{ a[4] }}</td>
+    <td>
+    {{ a[3] }} 
+    {% set allowed_types = ['BEHAVIOR', 'RANSOMWARE', 'FILE_PROTECTION', 'BEHAVIOR_POLICY'] %}
+    
+    {% if a[2] in allowed_types and a[6] and a[6] != '[]' %}
+        <!-- THE FIX: Use b64encode to prevent quotes from breaking the button -->
+        <button onclick="showLineage('{{ a[6]|b64encode }}')" 
+                style="width:auto; padding:3px 10px; font-size:0.75em; background:var(--accent-purple); color:white; border:1px solid rgba(255,255,255,0.2); border-radius:4px; margin-left:10px; cursor:pointer;">
+            🔍 INVESTIGATE
+        </button>
+    {% endif %}
+</td>
+</tr>
+{% endfor %}
+            </tbody>
+        </table>
+<div id="lineageModal" class="modal">
+    <div class="modal-content" style="border-color: var(--accent-purple); width: 500px;">
+        <h3 style="color:var(--accent-purple);">🛡️ Root Cause Analysis</h3>
+        <div id="treeContent" style="text-align: left; padding: 20px;"></div>
+        <button onclick="document.getElementById('lineageModal').style.display='none'">CLOSE</button>
+    </div>
+</div>
+
+<script>
+function showLineage(base64Data) {
+    const modal = document.getElementById('lineageModal');
+    const container = document.getElementById('treeContent');
+    
+    try {
+        // Decode the safe Base64 string back into JSON
+        const jsonStr = atob(base64Data);
+        const data = JSON.parse(jsonStr);
+        
+        let html = "";
+        // Show Root -> Malware
+        data.reverse().forEach((proc, i) => {
+            html += `
+            <div style="margin-left:${i * 25}px; margin-bottom:15px; border-left: 2px solid var(--accent-purple); padding-left:15px;">
+                <div style="background:rgba(88, 166, 255, 0.1); padding:8px; border-radius:4px; border:1px solid #333;">
+                    <b style="color:var(--accent-blue); font-size:0.9em;">${proc.name}</b> 
+                    <span style="color:#666; font-size:0.8em;">(PID: ${proc.pid})</span><br>
+                    <code style="font-size:0.75em; color:#aaa; word-break:break-all;">${proc.cmd}</code>
+                </div>
+                <div style="color:var(--accent-purple); margin-left:5px; margin-top:5px;">↓</div>
+            </div>`;
+        });
+
+        html += `<div style="margin-left:${data.length * 25}px; background:rgba(248, 81, 73, 0.15); padding:10px; border:1px solid var(--red); border-radius:4px;">
+                    <b style="color:var(--red)">🛑 MALICIOUS PROCESS NEUTRALIZED</b>
+                 </div>`;
+
+        container.innerHTML = html;
+        modal.style.display = 'block';
+    } catch (err) {
+        console.error(err);
+        alert("Forensic Error: JSON parsing failed.");
+    }
+}
+</script>
+    {% elif view == 'event_details' %}
+        <h2>Executive Threat Analytics</h2>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+        <div class="panel">
+            <h3 style="font-size: 0.9em; margin-bottom: 10px;">TOP 5 ATTACKED ENDPOINTS</h3>
+            <div class="chart-container"><canvas id="endpointChart"></canvas></div>
+        </div>
+        <div class="panel">
+            <h3 style="font-size: 0.9em; margin-bottom: 10px;">THREAT DISTRIBUTION</h3>
+            <div class="chart-container"><canvas id="threatChart"></canvas></div>
+        </div>
+    </div>
+    <div class="panel">
+        <h3 style="font-size: 0.9em; margin-bottom: 10px;">7-DAY THREAT TRENDS</h3>
+        <div class="chart-container" style="height: 200px;"><canvas id="historyChart"></canvas></div>
+    </div>
+
+    <script>
+        const cData = {{ chart_data | tojson }};
+        
+        // Image 3 Texture Palette (Purple, Navy, Royal, Cyber, Teal)
+        const agentPalette = [
+            '#6f42c1', '#3949ab', '#1e88e5', '#00acc1', '#26a69a', 
+            '#5e35b1', '#1565c0', '#0097a7', '#00897b', '#43a047'
+        ];
+
+        // 1. Bar Chart with Unique Colors per Agent
+        new Chart(document.getElementById('endpointChart'), { 
+            type: 'bar', 
+            data: { 
+                labels: cData.endpoints.labels, 
+                datasets: [{ 
+                    label: 'Alerts', 
+                    data: cData.endpoints.counts, 
+                    backgroundColor: agentPalette, // Assigns different colors to bars
+                    borderRadius: 4
+                }] 
+            },
+            options: { 
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true, ticks: { color: '#888' }, grid: { color: '#222' } } }
+            }
+        });
+
+        // 2. Doughnut Chart (Circle)
+        new Chart(document.getElementById('threatChart'), { 
+            type: 'doughnut', 
+            data: { 
+                labels: cData.threats.labels, 
+                datasets: [{ 
+                    data: cData.threats.counts, 
+                    backgroundColor: ['#f85149', '#d29922', '#bf5af2', '#ff007f', '#58a6ff'],
+                    borderWidth: 0 
+                }] 
+            },
+            options: { 
+                maintainAspectRatio: false,
+                cutout: '70%',
+                plugins: { legend: { position: 'right', labels: { color: '#c9d1d9', boxWidth: 10 } } }
+            }
+        });
+
+        // 3. Line Chart
+       new Chart(document.getElementById('historyChart'), { 
+           type: 'line', 
+           data: { 
+               labels: cData.history.labels, 
+               datasets: [{ 
+                   label: 'Alerts', 
+                   data: cData.history.counts, 
+                   borderColor: '#3fb950', 
+                   fill: true, 
+                   backgroundColor: 'rgba(63, 185, 80, 0.1)',
+                   tension: 0.3
+               }] 
+           },
+           options: { 
+               maintainAspectRatio: false,
+               // ADD THIS SECTION TO REMOVE THE BUTTON
+               plugins: {
+                legend: {
+                display: false
+           }
+        },
+        scales: { y: { beginAtZero: true, ticks: { color: '#888' } } }
+    }
+});
+    </script>
+{% elif view == 'active_scan' %}
+
+    {% if request.args.get('tab') == 'fleet' %}
+        <!-- ========================================== -->
+        <!-- SCREEN 2: FLEET ORCHESTRATION (The New View) -->
+        <!-- ========================================== -->
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+            <h2 style="color: var(--accent-purple);">🛰️ Fleet Orchestration & Scheduling</h2>
+            <a href="/?view=active_scan" class="nav-btn" style="background:var(--accent-purple); width:250px; color:white;">BACK TO MANUAL SCAN</a>
+        </div>
+
+        <div class="panel" style="border-color: var(--accent-purple); padding: 30px;">
+            <h3 style="color:var(--text); margin-top:0;">AUTOMATED FLEET SCHEDULE</h3>
+            <!-- THE FIX: Now using 'fleet_scan_time' instead of 'shutdown_pwd' -->
+            <p>Current Daily Schedule: <b style="color:var(--accent-green);">{{ fleet_scan_time }} (24h format)</b></p>
+            
+            <form action="/update_fleet_schedule" method="post" style="display:flex; gap:15px; align-items:center; background: rgba(255,255,255,0.02); padding: 20px; border-radius: 8px;">
+                <label>Set Global Scan Time:</label>
+                <input type="time" name="scan_time" value="{{ fleet_scan_time }}" style="width:200px; font-size: 1.2em; border-color: var(--accent-purple);">
+                <button type="submit" style="background:var(--accent-purple); width:250px; color:white;">APPLY TO ALL AGENTS</button>
+            </form>
+
+            <div style="margin-top:40px; padding:30px; background:rgba(0,0,0,0.5); border-radius:12px; text-align:center; border: 1px solid #222;">
+                <span style="color:#888; font-size:0.9em; letter-spacing:2px;">COUNTDOWN TO NEXT AUTOMATED FLEET SCAN</span>
+                <!-- THE FIX: Countdown now works dynamically -->
+                <div id="countdownClock" style="font-size:4em; font-family:monospace; color:var(--accent-blue); text-shadow: 0 0 20px var(--accent-blue); margin: 15px 0;">00:00:00</div>
+				<div id="fleetProgressContainer" style="margin-top: 30px;">
+            <!-- Dynamic Bars for every PC will appear here -->
+            </div>
+            </div>
+			
+        </div>
+
+        <script>
+            function updateFleetCountdown() {
+                const now = new Date();
+                const timeParts = "{{ fleet_scan_time }}".split(":");
+                let target = new Date();
+                target.setHours(parseInt(timeParts[0]), parseInt(timeParts[1]), 0);
+
+                if (now > target) target.setDate(target.getDate() + 1);
+
+                let diff = target - now;
+                let h = Math.floor(diff / 3600000);
+                let m = Math.floor((diff % 3600000) / 60000);
+                let s = Math.floor((diff % 60000) / 1000);
+                
+                document.getElementById('countdownClock').innerText = 
+                    (h < 10 ? "0"+h : h) + ":" + (m < 10 ? "0"+m : m) + ":" + (s < 10 ? "0"+s : s);
+            }
+            setInterval(updateFleetCountdown, 1000);
+            updateFleetCountdown();
+			async function updateFleetBars() {
+    if (window.location.href.indexOf('tab=fleet') === -1) return;
+    try {
+        let r = await fetch('/api/active_fleet_scans');
+        let scans = await r.json();
+        let container = document.getElementById('fleetProgressContainer');
+        
+        // 1. Get IDs of scans currently being reported
+        let activeIds = Object.keys(scans);
+
+        // 2. Remove bars for agents that are no longer scanning
+        let existingBars = container.querySelectorAll('.progress-container');
+        existingBars.forEach(bar => {
+            let aid = bar.getAttribute('data-aid');
+            if (!activeIds.includes(aid)) bar.remove();
+        });
+
+        // 3. Update or Create bars
+        for (let aid in scans) {
+            let data = scans[aid];
+            let safeId = aid.replace(/[^a-zA-Z0-9]/g, "_");
+            let barId = "fleet_bar_" + safeId;
+            let element = document.getElementById(barId);
+
+            if (!element) {
+                let html = `
+                <div id="${barId}" data-aid="${aid}" class="progress-container" style="display:block; border-color:var(--accent-purple); margin-bottom:15px; background:rgba(0,0,0,0.3);">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                        <span style="color:var(--accent-blue); font-weight:bold;">💻 ${aid}</span>
+                        <span id="perc_${barId}" style="color:var(--accent-green)">${data.percent}%</span>
+                    </div>
+                    <div class="progress-bg"><div id="fill_${barId}" class="progress-fill" style="width:${data.percent}%; background:linear-gradient(90deg, #bf5af2, var(--accent-blue));"></div></div>
+                    <div style="font-size:0.75em; color:#888;">Scanning: <i id="path_${barId}">${data.path}</i></div>
+                </div>`;
+                container.insertAdjacentHTML('beforeend', html);
+            } else {
+                document.getElementById("fill_" + barId).style.width = data.percent + "%";
+                document.getElementById("perc_" + barId).innerText = data.percent + "%";
+                document.getElementById("path_" + barId).innerText = data.path;
+            }
+        }
+    } catch (e) { console.log("Fleet Bar Error", e); }
+}
+setInterval(updateFleetBars, 3000);
+        </script>
+
+    {% else %}
+        <!-- ========================================== -->
+        <!-- SCREEN 1: MANUAL SCAN (The Original View) -->
+        <!-- ========================================== -->
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+            <h2>Remote Active Scan</h2>
+            <a href="/?view=active_scan&tab=fleet" class="nav-btn" style="background:var(--accent-purple); width:auto; padding:8px 15px;">🛰️ CONFIGURE FLEET SCAN</a>
+        </div>
+
+        <div id="scanProgressBar" class="progress-container">
+            <div style="display:flex; justify-content:space-between; font-weight:bold;">
+                <span> SCANNING: <span id="progAgent" style="color:var(--accent)"></span></span>
+                <span id="progPercent" style="color:var(--green)">0%</span>
+            </div>
+            <div class="progress-bg"><div id="progFill" class="progress-fill"></div></div>
+            <div style="font-size:0.85em; color:#aaa;">Path: <i id="progPath"></i> | <span id="progTime">Time: 0s</span></div>
+        </div>
+
+        <div class="panel">
+            <h3>Initialize New Scan</h3>
+            <select id="target_aid">{% for a in agents %}<option value="{{ a[0] }}">{{ a[0] }}</option>{% endfor %}</select>
+            <button onclick="openBrowser(document.getElementById('target_aid').value)" style="background:#333;">BROWSE FOLDER/DRIVE</button>
+            <input type="text" id="manual_path" placeholder="Path selected from browser will appear here...">
+            <button onclick="startScan(document.getElementById('manual_path').value)" style="background:var(--green); margin-top:10px;">LAUNCH SCAN</button>
+        </div>
+
+        <h3 style="margin-top: 30px; color: var(--accent-blue); font-size: 0.9em; letter-spacing: 1px;">RECENT SCAN HISTORY</h3>
+        <table>
+            <thead>
+                <tr style="font-size: 0.75em; color: var(--accent-green);">
+                    <th>TIMESTAMP</th><th>HOSTNAME</th><th>SCAN DETAILS</th><th style="text-align:right;">STATUS</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in scan_history %}
+                <tr style="font-size: 0.85em; border-bottom: 1px solid #111;">
+                    <td style="color:#888;">{{ s[0] }}</td>
+                    <td style="color:var(--text);"><b>{{ s[1] }}</b></td>
+                    <td>
+                        <span style="color:var(--accent-green)">Path:</span> <code style="color:#ccc;">{{ s[2] }}</code> | 
+                        <span style="color:var(--accent-green)">Checked:</span> {{ s[3] }} | 
+                        <span style="color:var(--red)">Removed:</span> {{ s[4] }} | 
+                        <span style="color:#777;">Duration: {{ s[5] }}</span>
+                    </td>
+                    <td style="text-align:right;">
+                        <span style="padding: 2px 8px; border-radius: 3px; font-size: 0.75em; font-weight: bold;
+                            background: {{ 'rgba(57, 255, 20, 0.1)' if 'COMPLETED' in s[6] else 'rgba(248, 81, 73, 0.1)' }}; 
+                            color: {{ 'var(--green)' if 'COMPLETED' in s[6] else 'var(--red)' }};
+                            border: 1px solid {{ 'var(--green)' if 'COMPLETED' in s[6] else 'var(--red)' }};">
+                            {{ s[6] }}
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+        {% elif view == 'summary' %}
+		<!-- THE 4 POSTURE BLOCKS (Exactly where you marked the blue lines) -->
+    <div class="posture-container">
+        <!-- BLOCK 1: Average Compliance -->
+        <div class="posture-box comp-green">
+            <span class="posture-label">Avg. Compliance</span>
+            <span class="posture-number">{{ avg_comp }}%</span>
+        </div>
+
+        <!-- BLOCK 2: Non-Compliant -->
+        <div class="posture-box comp-red">
+            <span class="posture-label">Non-Compliant</span>
+            <span class="posture-number">{{ non_comp_nodes }} Nodes</span>
+        </div>
+
+        <!-- BLOCK 3: Hardened -->
+        <div class="posture-box comp-blue">
+            <span class="posture-label">Hardened Nodes</span>
+            <span class="posture-number">{{ hardened_nodes }} Nodes</span>
+        </div>
+
+        <!-- BLOCK 4: Semi-Hardened -->
+        <div class="posture-box comp-orange">
+            <span class="posture-label">Semi-Hardened</span>
+            <span class="posture-number">{{ semi_hardened_nodes }} Nodes</span>
+        </div>
+    </div>
+        <h2>Managed Endpoints</h2>
+        <table>
+    <thead>
+        <tr>
+            <th>Status</th>
+            <th>Name</th>
+            <th>IP Address</th>
+            <th>OS</th>
+            <th style="color: var(--accent-blue);">CPU / RAM</th>
+            <th style="color: var(--accent-blue);">DISK FREE</th>
+            <th>Last Seen</th>
+            <th style="color: var(--orange);">Network Isolation</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for a in agents %}
+        <tr>
+            <!-- a[4] = Status -->
+            <td><span class="dot dot-{{ a[4] }}"></span> {{ a[4] }}</td>
+
+            <!-- NAME COLUMN WITH VULNERABILITY BADGE (a[0] = Name, a[9] = Count) -->
+            <td>
+                <!--<b>{{ a[0] }}</b>-->
+				 <a href="/?view=agent_details&agent_id={{ a[0] }}" style="color:var(--accent-blue); text-decoration:none; font-weight:bold;">
+        {{ a[0] }}
+    </a>
+                {% if a[9] > 0 %}
+                    <span style="background: var(--red); color: white; border-radius: 10px; padding: 2px 8px; font-size: 0.8em; margin-left: 5px; font-weight: bold; box-shadow: 0 0 5px rgba(248, 81, 73, 0.5);" title="{{ a[9] }} Vulnerabilities Found">
+                        {{ a[9] }}
+                    </span>
+                {% endif %}
+            </td>
+
+            <!-- a[1] = IP, a[2] = OS -->
+            <td>{{ a[1] }}</td>
+            <td>{{ a[2] }}</td>
+            
+            <!-- a[6] = CPU %, a[7] = RAM Total -->
+            <td>
+                <span style="color: {{ 'var(--red)' if a[6] > 85 else 'var(--accent-green)' }}">
+                    {{ a[6]|round(1) }}%
+                </span> 
+                <span style="color: #666;">/ {{ a[7] }} GB</span>
+            </td>
+
+            <!-- a[8] = Disk Free -->
+            <td>
+    <b style="color: {{ 'var(--red)' if a[8] < 5 else 'var(--text)' }}">
+        {{ a[8]|round(1) }} GB
+    </b>
+</td>
+
+            <!-- a[3] = Last Seen -->
+            <td>{{ a[3] }}</td>
+            
+            <!-- a[5] = Is Isolated -->
+            <td>
+                <div style="display:flex; gap:5px;">
+                    {% set is_active = (a[4] == 'Active') %}
+                    {% set is_isolated = (a[5] == 1) %}
+                    
+                    <!-- ISOLATE BUTTON -->
+                    <a href="/isolate/{{ a[0] }}" class="nav-btn" 
+                       style="background:var(--red); padding:5px 10px; font-size:0.7em; margin:0; text-align:center; width: 70px; {% if not is_active or is_isolated %} opacity: 0.3; pointer-events: none; filter: grayscale(1); {% endif %}" 
+                       onclick="return confirm('Isolate this host from the network?')">
+                       ISOLATE
+                    </a>
+
+                    <!-- RESTORE BUTTON -->
+                    <a href="/restore/{{ a[0] }}" class="nav-btn" 
+                       style="background:var(--green); padding:5px 10px; font-size:0.7em; margin:0; text-align:center; width: 70px; {% if not is_active or not is_isolated %} opacity: 0.3; pointer-events: none; filter: grayscale(1); {% endif %}">
+                       RESTORE
+                    </a>
+					<a href="/request_deactivate/{{ a[0] }}" class="nav-btn" 
+           style="background: #222; border: 1px solid #444; padding:5px 10px; font-size:0.7em; margin:0; text-align:center; width: 80px; {% if not is_active %} opacity: 0.3; pointer-events: none; filter: grayscale(1); {% endif %}"
+           onclick="return confirm('Request PIN to stop this agent?')">
+           DEACTIVATE
+        </a>
+                </div>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% if request.args.get('deact_pending') %}
+<div class="panel" style="border-color: var(--orange); margin-top: 20px; animation: blink 2s infinite;">
+    <h3 style="color: var(--orange); margin-top:0;">🛡️ SHIELD DEACTIVATION REQUIRED</h3>
+    <p>Agent <b>{{ request.args.get('deact_pending') }}</b> is in Iron-Lock mode. Enter PIN from email to disarm.</p>
+    <form action="/confirm_deactivate" method="post" style="display:flex; gap:10px;">
+        <input type="hidden" name="agent_id" value="{{ request.args.get('deact_pending') }}">
+        <input type="text" name="pin" placeholder="ENTER 6-DIGIT PIN" maxlength="6" 
+               style="width: 250px; font-size: 1.2em; text-align: center; border-color: var(--orange);" required>
+        <button type="submit" style="background: var(--red); width: 200px;">CONFIRM DISARM</button>
+        <a href="/?view=summary" class="nav-btn" style="background:#333; width: 100px; text-align:center; padding-top:12px;">Cancel</a>
+    </form>
+</div>
+{% endif %}
+{% elif view == 'agent_details' %}
+    {% set host = agents|selectattr(0, 'equalto', request.args.get('agent_id'))|first %}
+    <div style="display: flex; gap: 25px; height: 100%;">
+        <!-- LEFT MENU -->
+        <div style="width: 220px; background: rgba(255,255,255,0.03); padding: 15px; border-radius: 8px;">
+            <h4 style="color: var(--accent-blue); margin-top:0;">Inventory Menu</h4>
+           <!-- <a href="#" class="nav-btn nav-active">Basic Details</a>
+            <a href="#" class="nav-btn" style="opacity:0.5">Hardware</a>-->
+			<a href="/?view=agent_details&agent_id={{ host[0] }}&tab=basic" class="nav-btn {{ 'nav-active' if tab == 'basic' }}">Basic Details</a>
+            <a href="/?view=agent_details&agent_id={{ host[0] }}&tab=hardware" class="nav-btn {{ 'nav-active' if tab == 'hardware' }}">Hardware Specs</a>
+            <!--<a href="#" class="nav-btn" style="opacity:0.5">Users</a>-->
+			<!--<a href="/?view=agent_details&agent_id={{ host[0] }}&tab=users" class="nav-btn {{ 'nav-active' if tab == 'users' }}">User Accounts</a>-->
+			<a href="/?view=agent_details&agent_id={{ host[0] }}&tab=users" 
+       class="nav-btn {{ 'nav-active' if tab == 'users' or tab == 'history' }}">User Accounts</a>
+            <!--<a href="#" class="nav-btn" style="opacity:0.5">Software</a>-->
+			<a href="/?view=agent_details&agent_id={{ host[0] }}&tab=software" class="nav-btn {{ 'nav-active' if tab == 'software' }}">Software Inventory</a>
+            <!--<a href="#" class="nav-btn" style="opacity:0.5">Listening Ports</a>-->
+			<a href="/?view=agent_details&agent_id={{ host[0] }}&tab=ports" class="nav-btn {{ 'nav-active' if tab == 'ports' }}">Listening Ports</a>
+			<a href="/?view=agent_details&agent_id={{ host[0] }}&tab=cis" class="nav-btn {{ 'nav-active' if tab == 'cis' }}">🛡️ CIS Benchmark</a>
+            <hr border="0" style="border-top:1px solid #333; margin: 20px 0;">
+            <a href="/?view=summary" class="nav-btn" style="color:var(--orange)">← Back to Summary</a>
+        </div>
+
+        <!-- RIGHT DATA PANEL -->
+		<!-- Replace your 'Basic Information' table inside agent_details view -->
+ <div class="panel" style="flex: 1; border-color: var(--accent-blue);">
+	{% if tab == 'basic' %}
+    <h2 style="margin-top:0;">System Properties: <span style="color:var(--accent-green)">{{ host[0] }}</span></h2>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+        <!-- LEFT: READ ONLY DATA -->
+        <div>
+            <h3 style="border-bottom: 1px solid #333; padding-bottom:10px;">Basic Information</h3>
+            <table style="background:transparent; width: 100%;">
+                <tr><td style="color:#888;">MAC Address</td><td style="color:var(--accent-blue)">{{ host[10] or 'N/A' }}</td></tr>
+                <tr><td style="color:#888;">AD Domain</td><td>{{ host[11] or 'WORKGROUP' }}</td></tr>
+                <tr><td style="color:#888;">IPv4 Address</td><td>{{ host[1] }}</td></tr>
+                <tr><td style="color:#888;">OS Version</td><td>{{ host[2] }}</td></tr>
+                <tr><td style="color:#888;">Kernel</td><td>{{ host[12] or 'N/A' }}</td></tr>
+                <tr><td style="color:#888;">Activation</td><td>
+                    <span style="color: {{ 'var(--green)' if 'Licensed' in (host[13]|string) else 'var(--red)' }}">
+                        {{ host[13] or 'Unknown' }}
+                    </span>
+                </td></tr>
+                <tr><td style="color:#888;">OS Installed</td><td>{{ host[14] or 'N/A' }}</td></tr>
+                <tr><td style="color:#888;">Last Seen</td><td>{{ host[3] }}</td></tr>
+                
+                <!-- Asset Data shown below Last Seen -->
+                <tr style="border-top: 1px solid #222;"><td style="color:#888; padding-top:15px;">Assigned Owner</td><td style="color:var(--accent-green); padding-top:15px;">{{ host[15] or 'Unassigned' }}</td></tr>
+                <tr><td style="color:#888;">Staff Number</td><td>{{ host[16] or 'N/A' }}</td></tr>
+                <tr><td style="color:#888;">Phone Number</td><td>{{ host[17] or 'N/A' }}</td></tr>
+                <tr><td style="color:#888;">Asset Email</td><td>{{ host[18] or 'N/A' }}</td></tr>
+            </table>
+        </div>
+
+        <!-- RIGHT: EDITABLE FORM -->
+        <div style="border-left: 1px solid #333; padding-left: 30px;">
+            <h3 style="border-bottom: 1px solid #333; padding-bottom:10px;">Edit Asset Details</h3>
+            <form action="/update_agent_asset" method="post">
+                <input type="hidden" name="agent_id" value="{{ host[0] }}">
+                <label style="font-size:0.8em; color:var(--accent-green)">OWNER NAME</label>
+                <input type="text" name="owner" value="{{ host[15] or '' }}" placeholder="Enter name...">
+                
+                <label style="font-size:0.8em; color:var(--accent-green)">STAFF NO</label>
+                <input type="text" name="staff" value="{{ host[16] or '' }}" placeholder="ID-1234">
+                
+                <label style="font-size:0.8em; color:var(--accent-green)">PHONE NO</label>
+                <input type="text" name="phone" value="{{ host[17] or '' }}" placeholder="+92...">
+                
+                <label style="font-size:0.8em; color:var(--accent-green)">EMAIL ADDRESS</label>
+                <input type="email" name="email" value="{{ host[18] or '' }}" placeholder="user@company.com">
+                
+                <button type="submit" style="margin-top:10px; background:var(--accent-blue); color:black;">UPDATE RECORDS</button>
+            </form>
+        </div>
+    </div>
+ {% elif tab == 'hardware' %}
+                <h2 style="margin-top:0;">Hardware Inventory: <span style="color:#ff9f0a">{{ host[0] }}</span></h2>
+                {% if hw_data %}
+                <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 30px;">
+                    <div>
+                        <h3 style="color:var(--accent-blue); border-bottom:1px solid #333;">Core Components</h3>
+                        <table style="background:transparent; width: 100%;">
+                            <tr><td style="color:#888;">CPU Model</td><td style="color:var(--accent-green)">{{ hw_data.cpu.model }}</td></tr>
+                            <tr><td style="color:#888;">CPU Speed</td><td>{{ hw_data.cpu.freq }}</td></tr>
+                            <tr><td style="color:#888;">Motherboard</td><td>{{ hw_data.mobo.model }}</td></tr>
+                            <tr><td style="color:#888;">Serial Number</td><td style="font-family:monospace; font-size:0.9em;">{{ hw_data.mobo.serial }}</td></tr>
+							<tr><td style="color:#888;">RAM Model</td><td>{{ hw_data.ram.model }}</td></tr>
+  <tr><td style="color:#888;">RAM Speed</td><td>{{ hw_data.ram.freq }}</td></tr>
+  <tr><td style="color:#888;">RAM Usage</td><td style="color:var(--accent-green)">{{ hw_data.ram.usage }} ({{ hw_data.ram.total }})
+                            <tr><td style="color:#888;">Graphic Card</td><td style="color:var(--accent-blue)">{{ hw_data.gpu }}</td></tr>
+                        </table>
+
+                        <h3 style="color:var(--accent-blue); border-bottom:1px solid #333; margin-top:25px;">Peripherals & Network</h3>
+                        <table style="background:transparent; width: 100%;">
+                            <tr><td style="color:#888;">Network Adapter</td><td>{{ hw_data.network }}</td></tr>
+                            <tr><td style="color:#888;">Sound Controller</td><td>{{ hw_data.sound }}</td></tr>
+                            <tr><td style="color:#888;">Monitor Model</td><td>{{ hw_data.monitor }}</td></tr>
+                        </table>
+                    </div>
+
+                    <div>
+                        <h3 style="color:var(--accent-blue); border-bottom:1px solid #333;">Storage Partitions</h3>
+                        {% for p in hw_data.partitions %}
+                        <div style="margin-bottom:20px; background: rgba(255,255,255,0.02); padding: 10px; border-radius: 5px;">
+                            <div style="display:flex; justify-content:space-between; font-size:0.9em;">
+                                <span>Drive <b>{{ p.drive }}</b></span>
+                                <span style="color: {{ 'var(--red)' if p.percent > 90 else '#888' }}">
+                                    {{ p.used }} / {{ p.total }} GB ({{ p.percent }}%)
+                                </span>
+                            </div>
+                            <div class="hw-progress-bg">
+                                <div class="hw-progress-fill" style="width: {{ p.percent }}%;"></div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% else %}
+                    <p style="color:#888; text-align:center; padding:50px;">Waiting for Agent to upload hardware profile...</p>
+                {% endif %}
+			{% elif tab == 'users' %}
+                <h2 style="margin-top:0; color:var(--accent-blue);">System User Inventory</h2>
+                <div style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px;">
+                    <table style="width:100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid var(--border);">
+                                <th style="padding:10px;">No.</th>
+                                <th>Username</th>
+                                <th>Account Status</th>
+                                <th>Type</th>
+                                <th>Role</th>
+                                <th>Password Changed</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+						<tbody>
+                            {% if user_list %}
+                                {% for u in user_list %}
+                                <tr style="border-bottom: 1px solid #222;">
+                                    <td style="padding:12px;">{{ loop.index }}</td>
+                                    <td><b style="color:var(--accent-green)">{{ u[0] }}</b></td> <!-- Username -->
+                                    <td>
+                                        <span style="color: {{ 'var(--green)' if u[1] == 'Enabled' else '#666' }}">
+                                            ● {{ u[1] }}
+                                        </span>
+                                    </td>
+                                    <td>{{ u[2] }}</td> <!-- User Type -->
+                                    <td>
+                                        <span style="padding: 2px 8px; border-radius: 4px; background: {{ 'rgba(210, 153, 34, 0.2)' if u[3] == 'Admin' else 'transparent' }}; color: {{ 'var(--orange)' if u[3] == 'Admin' else 'inherit' }}">
+                                            {{ u[3] }}
+                                        </span>
+                                    </td>
+                                    <td>{{ u[4] }}</td> <!-- Last Pass Change -->
+                                    <td>
+                                        <a href="/?view=agent_details&agent_id={{ host[0] }}&tab=history&user_name={{ u[0] }}" 
+                                           style="color:var(--accent-blue); text-decoration:none; font-size:0.85em;">
+                                           View Login History
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="7" style="text-align:center; padding:40px; color:#666;">
+                                        No local user data found in database for this agent.
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+					</div><!--from here-->
+					{% elif tab == 'history' %}
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 15px;">
+                    <h2 style="margin:0; color:var(--accent-blue);">Login History: <span style="color:var(--accent-green)">{{ request.args.get('user_name') }}</span></h2>
+                    <a href="/?view=agent_details&agent_id={{ host[0] }}&tab=users" style="color:var(--orange); text-decoration:none; font-weight:bold; font-size:0.9em;">
+                        ← Back to Users
+                    </a>
+                </div>
+
+                <div style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px;">
+                    <table style="width:100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid var(--border);">
+                                <th style="padding:10px;">No.</th>
+                                <th>Method</th>
+                                <th>Result</th>
+                                <th>Login Time</th>
+                                <th>Logout Time</th>
+                                <th>Source IP</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if selected_user_history %}
+                                {% for h in selected_user_history %}
+                                <tr style="border-bottom: 1px solid #222;">
+                                    <td style="padding:12px;">{{ loop.index }}</td>
+                                    <td style="color:var(--text)">{{ h.method }}</td>
+                                    <td style="color: {{ 'var(--green)' if h.result == 'Success' else 'var(--red)' }}">{{ h.result }}</td>
+                                    <td>{{ h.login }}</td>
+                                    <td>
+                                        {% if h.logout == "Session Active" or h.logout == "None" %}
+                                            <span style="color:var(--accent-green); font-style:italic;">Active Session</span>
+                                        {% else %}
+                                            {{ h.logout }}
+                                        {% endif %}
+                                    </td>
+                                    <td style="color:var(--accent-blue)">{{ h.ip }}</td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr><td colspan="6" style="text-align:center; padding:40px; color:#666;">No recent records found in Security Event Logs.</td></tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+			
+			{% elif tab == 'software' %}
+    <h2 style="margin-top:0; color:var(--accent-blue);">Software Inventory: <span style="color:var(--accent-green)">{{ host[0] }}</span></h2>
+    <div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 8px; border: 1px solid #222;">
+        <table id="softwareTable">
+            <thead>
+                <tr style="border-bottom: 2px solid var(--border);">
+                    <th style="padding:10px; width:50px;">No.</th>
+                    <th>Application Name</th>
+                    <th>Version</th>
+                    <th style="text-align:right;">Install Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- THE FIX: We use 'software_inventory' which comes from manager.py -->
+                {% if software_inventory %}
+                    {% for s in software_inventory %}
+                    <tr style="border-bottom: 1px solid #111;">
+                        <td style="padding:10px; color:#666;">{{ loop.index }}</td>
+                        <td><b style="color:var(--text)">{{ s[0] }}</b></td> <!-- Name -->
+                        <td><span style="color:var(--accent-blue)">{{ s[1] }}</span></td> <!-- Version -->
+                        <td style="text-align:right; color:#888;">{{ s[2] }}</td> <!-- Date -->
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="4" style="text-align:center; padding:50px; color:#555;">
+                            No software data available. The Agent will sync this shortly.
+                        </td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+{% elif tab == 'ports' %}
+    <h2 style="margin-top:0; color:var(--accent-blue);">Active Listening Ports: <span style="color:var(--accent-green)">{{ host[0] }}</span></h2>
+    <div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 8px; border: 1px solid #222;">
+        <table>
+            <thead>
+                <tr>
+                    <th>Protocol</th>
+                    <th>Port Number</th>
+                    <th>Initiated Process</th>
+                    <th>Risk Status</th>
+                    <th style="text-align:right;">Firewall Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if port_list %}
+                    {% for p in port_list %}
+                    {% set is_blocked = (p[4] == 1) %}
+                    <tr style="border-bottom: 1px solid #111;">
+                        <td><span style="color:var(--accent-blue)">{{ p[0] }}</span></td>
+                        <td><b style="color:white;">{{ p[1] }}</b></td>
+                        <td>
+                            <code style="color:var(--accent-green)">{{ p[2] }}</code> 
+                            <span style="color:#555; font-size:0.8em; margin-left:5px;">(PID: {{ p[3] }})</span>
+                        </td>
+                        <td>
+                            {% if p[1] in [21, 23, 135, 445, 3389] %}
+                                <span style="color:var(--orange)">⚠️ High Risk Service</span>
+                            {% else %}
+                                <span style="color:#666;">Normal</span>
+                            {% endif %}
+                        </td>
+                        <td style="text-align:right;">
+                            <div style="display:flex; gap:5px; justify-content: flex-end;">
+                                <!-- BLOCK BUTTON: Grayed out if already blocked -->
+                                <a href="/toggle_port/{{ host[0] }}/{{ p[0] }}/{{ p[1] }}/block" 
+                                   class="nav-btn" style="width:70px; padding:5px; font-size:0.7em; background:var(--red); {% if is_blocked %} opacity:0.3; pointer-events:none; filter:grayscale(1); {% endif %}">
+                                   BLOCK
+                                </a>
+                                <!-- UNBLOCK BUTTON: Grayed out if NOT blocked -->
+                                <a href="/toggle_port/{{ host[0] }}/{{ p[0] }}/{{ p[1] }}/unblock" 
+                                   class="nav-btn" style="width:80px; padding:5px; font-size:0.7em; background:var(--accent-blue); color:black; {% if not is_blocked %} opacity:0.3; pointer-events:none; filter:grayscale(1); {% endif %}">
+                                   UNBLOCK
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr><td colspan="5" style="text-align:center; padding:40px; color:#555;">No active ports reported by agent.</td></tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+{% elif tab == 'cis' %}
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <h2 style="margin:0;">CIS Compliance Shield: <span style="color:var(--accent-blue)">{{ host[0] }}</span></h2>
+        
+        <div style="display:flex; align-items:center; gap:20px;">
+            <a href="/trigger_cis/{{ host[0] }}" class="nav-btn" 
+               style="background:var(--side); border: 1px solid var(--accent-blue); padding: 8px 15px; margin:0; width:auto; font-size:0.8em;">
+               RE-SCAN COMPLIANCE
+            </a>
+
+            {% if cis_data %}
+            <div style="text-align:right;">
+                <span style="font-size:0.8em; color:#888;">OVERALL SCORE</span>
+                <div style="font-size:2em; font-weight:bold; color:{{ 'var(--green)' if cis_data.score > 70 else 'var(--orange)' if cis_data.score > 40 else 'var(--red)' }}">
+                    {{ cis_data.score }}%
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if cis_data %}
+        <!-- Top Score Bar -->
+        <div class="hw-progress-bg" style="height:15px; margin-bottom:10px;">
+            <div class="hw-progress-fill" style="width: {{ cis_data.score }}%; background:{{ 'var(--green)' if cis_data.score > 70 else 'var(--orange)' }}"></div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- CATEGORY 01: ACCOUNT & LOGON POLICIES -->
+        <!-- ========================================== -->
+        <div class="cis-category-bar active-header" onclick="toggleCisSection('accountPolicies', this)">
+            <span>01. ACCOUNT & LOGON POLICIES</span>
+            <span class="arrow">▼</span>
+        </div>
+        <table class="cis-content-table" id="accountPolicies">
+            <thead>
+                <tr><th style="width:350px;">Benchmark</th><th>Result</th><th>Fix / Details</th></tr>
+            </thead>
+            <tbody>
+                {% for item in cis_data.results %}
+                    {% if item.name.startswith('1.') %}
+                    <tr style="border-bottom:1px solid #111;">
+                        <td style="font-size: 0.95em;">{{ item.name }}</td>
+                        <td><b style="color:{{ 'var(--green)' if item.passed else 'var(--red)' }}">{{ '✅ PASS' if item.passed else '❌ FAIL' }}</b></td>
+                        <td style="font-size:0.85em; color:#888;">{{ item.details }}</td>
+                    </tr>
+                    {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- ========================================== -->
+        <!-- CATEGORY 02: ACCESS CONTROL POLICIES -->
+        <!-- ========================================== -->
+        <div class="cis-category-bar active-header" onclick="toggleCisSection('accessControl', this)">
+            <span>02. ACCESS CONTROL POLICIES</span>
+            <span class="arrow">▼</span>
+        </div>
+        <table class="cis-content-table" id="accessControl">
+            <thead>
+                <tr><th style="width:350px;">Benchmark</th><th>Result</th><th>Fix / Details</th></tr>
+            </thead>
+            <tbody>
+                {% for item in cis_data.results %}
+                    {% if item.name.startswith('2.') %}
+                    <tr style="border-bottom:1px solid #111;">
+                        <td style="font-size: 0.95em;">{{ item.name }}</td>
+                        <td><b style="color:{{ 'var(--green)' if item.passed else 'var(--red)' }}">{{ '✅ PASS' if item.passed else '❌ FAIL' }}</b></td>
+                        <td style="font-size:0.85em; color:#888;">{{ item.details }}</td>
+                    </tr>
+                    {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+		<!-- CATEGORY 03: SECURITY AUDIT POLICIES -->
+        <div class="cis-category-bar active-header" onclick="toggleCisSection('auditPolicies', this)">
+            <span>03. SECURITY AUDIT POLICIES</span>
+            <span class="arrow">▼</span>
+        </div>
+        <table class="cis-content-table" id="auditPolicies">
+            <thead>
+                <tr><th style="width:350px;">Benchmark</th><th>Result</th><th>Fix / Details</th></tr>
+            </thead>
+            <tbody>
+                {% for item in cis_data.results %}
+                    {% if item.name.startswith('3.') %}
+                    <tr style="border-bottom:1px solid #111;">
+                        <td style="font-size: 0.95em;">{{ item.name }}</td>
+                        <td><b style="color:{{ 'var(--green)' if item.passed else 'var(--red)' }}">{{ '✅ PASS' if item.passed else '❌ FAIL' }}</b></td>
+                        <td style="font-size:0.85em; color:#888;">{{ item.details }}</td>
+                    </tr>
+                    {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+		
+		<!-- CATEGORY 04: INTRUSION PREVENTION (Covers 4.1 to 4.6) -->
+        <div class="cis-category-bar active-header" onclick="toggleCisSection('intrusionPrev', this)">
+            <span>04. INTRUSION PREVENTION & NETWORK MGMT</span>
+            <span class="arrow">▼</span>
+        </div>
+        <table class="cis-content-table" id="intrusionPrev">
+            <thead>
+                <tr><th style="width:350px;">Benchmark</th><th>Result</th><th>Fix / Details</th></tr>
+            </thead>
+            <tbody>
+                {% for item in cis_data.results %}
+                    <!-- This 'if' catches 4.1.x, 4.2.x, 4.3.x, 4.4.x, 4.5.x, and 4.6.x -->
+                    {% if item.name.startswith('4.') %}
+                    <tr style="border-bottom:1px solid #111;">
+                        <td style="font-size: 0.95em;">{{ item.name }}</td>
+                        <td><b style="color:{{ 'var(--green)' if item.passed else 'var(--red)' }}">{{ '✅ PASS' if item.passed else '❌ FAIL' }}</b></td>
+                        <td style="font-size:0.85em; color:#888;">{{ item.details }}</td>
+                    </tr>
+                    {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+		<!-- CATEGORY 05: MALICIOUS CODE PREVENTION -->
+        <div class="cis-category-bar active-header" onclick="toggleCisSection('maliciousCode', this)">
+            <span>05. MALICIOUS CODE PREVENTION</span>
+            <span class="arrow">▼</span>
+        </div>
+        <table class="cis-content-table" id="maliciousCode">
+            <thead>
+                <tr><th style="width:350px;">Benchmark</th><th>Result</th><th>Fix / Details</th></tr>
+            </thead>
+            <tbody>
+                {% for item in cis_data.results %}
+                    {% if item.name.startswith('5.') %}
+                    <tr style="border-bottom:1px solid #111;">
+                        <td style="font-size: 0.95em;">{{ item.name }}</td>
+                        <td><b style="color:{{ 'var(--green)' if item.passed else 'var(--red)' }}">{{ '✅ PASS' if item.passed else '❌ FAIL' }}</b></td>
+                        <td style="font-size:0.85em; color:#888;">{{ item.details }}</td>
+                    </tr>
+                    {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+		<!-- CATEGORY 06: HISTORY INFORMATION PROTECTION -->
+        <div class="cis-category-bar active-header" onclick="toggleCisSection('historyProtection', this)">
+            <span>06. HISTORY INFORMATION PROTECTION</span>
+            <span class="arrow">▼</span>
+        </div>
+        <table class="cis-content-table" id="historyProtection">
+            <thead>
+                <tr><th style="width:350px;">Benchmark</th><th>Result</th><th>Fix / Details</th></tr>
+            </thead>
+            <tbody>
+                {% for item in cis_data.results %}
+                    {% if item.name.startswith('6.') %}
+                    <tr style="border-bottom:1px solid #111;">
+                        <td style="font-size: 0.95em;">{{ item.name }}</td>
+                        <td><b style="color:{{ 'var(--green)' if item.passed else 'var(--red)' }}">{{ '✅ PASS' if item.passed else '❌ FAIL' }}</b></td>
+                        <td style="font-size:0.85em; color:#888;">{{ item.details }}</td>
+                    </tr>
+                    {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p style="text-align:center; padding:50px; color:#666;">Waiting for compliance audit to sync...</p>
+    {% endif %}
+
+    <script>
+    function toggleCisSection(sectionId, headerElement) {
+        var table = document.getElementById(sectionId);
+        if (table.style.display === "none") {
+            table.style.display = "table";
+            headerElement.classList.add("active-header");
+        } else {
+            table.style.display = "none";
+            headerElement.classList.remove("active-header");
+        }
+    }
+    </script>
+{% endif %}
+        </div> 		<!-- END OF USER ACCOUNTS TAB -->
+    </div>
+    {% elif view == 'usb' %}
+        <h2>USB Policy Management</h2>
+        <div class="panel">
+            <form action="/add_usb" method="post">
+                <input type="text" name="device_id" placeholder="Device ID" required>
+                <select name="target_agent"><option value="GLOBAL">GLOBAL</option>{% for a in agents %}<option value="{{ a[0] }}">{{ a[0] }}</option>{% endfor %}</select>
+                <button type="submit">WHITELIST USB</button>
+            </form>
+        </div>
+        <table><thead><tr><th>Device ID</th><th>Target</th><th>Action</th></tr></thead>
+            <tbody>{% for u in usb %}<tr><td><code>{{ u[1] }}</code></td><td>{{ u[2] }}</td><td><a href="/del_usb/{{ u[0] }}" style="color:var(--red)">Remove</a></td></tr>{% endfor %}</tbody>
+        </table>
+
+    {% elif view == 'policy' %}
+        <h2>Application Control Policy</h2>
+        <div class="panel">
+            <form action="/add_block" method="post"><input type="text" name="app_name" placeholder="e.g. vlc.exe" required><button type="submit">BLOCK APP</button></form>
+        </div>
+        <table><thead><tr><th>Process</th><th>Action</th></tr></thead>
+            <tbody>{% for b in blocked %}<tr><td>{{ b[1] }}</td><td><a href="/del_block/{{ b[0] }}" style="color:var(--red)">Remove</a></td></tr>{% endfor %}</tbody>
+        </table>
+        
+        <h2 style="margin-top: 40px;"> Parent-Child Behavioral Rules</h2>
+        <div class="panel">
+            <form action="/add_behavior_rule" method="post">
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" name="parent_proc" placeholder="Parent (calculator.exe)" required>
+                    <input type="text" name="child_proc" placeholder="Child (cmd.exe)" required>
+                </div>
+                <select name="target_agent"><option value="GLOBAL">GLOBAL</option>{% for a in agents %}<option value="{{ a[0] }}">{{ a[0] }}</option>{% endfor %}</select>
+                <button type="submit" style="background: var(--orange);">ADD RELATIONSHIP RULE</button>
+            </form>
+        </div>
+        <table><thead><tr><th>Parent</th><th>Child</th><th>Target</th><th>Action</th></tr></thead>
+            <tbody>{% for rule in beh_rules %}<tr><td><code>{{ rule[1] }}</code></td><td><code>{{ rule[2] }}</code></td><td>{{ rule[3] }}</td><td><a href="/del_behavior_rule/{{ rule[0] }}" style="color:var(--red);">Remove</a></td></tr>{% endfor %}</tbody>
+        </table>
+    <div style="margin-top: 30px; text-align: center; display: flex; justify-content: center; gap: 20px;">
+    <!-- Original Intelligence Button -->
+    <a href="/?view=ip_intel" class="intel-btn">
+        <span class="icon">🔍</span> 
+        <span>Global IP Intel</span>
+    </a>
+	<a href="/?view=hashes" class="intel-btn" style="border-color: var(--accent-purple); background: linear-gradient(135deg, #1a0033 0%, #000b1a 100%);">
+        <span class="icon">☣️</span> 
+        <span>Malicious Hashes</span>
+    </a>
+    <!-- NEW: MALICIOUS HASHES BUTTON -->
+    
+</div>
+{% elif view == 'hashes' %}
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2 style="color: var(--accent-purple);">☣️ Global Malware Blacklist</h2>
+        <span style="font-size: 0.8em; color: #888;">INTERNAL THREAT REPOSITORY</span>
+    </div>
+
+    <!-- MANUAL HASH ENTRY PANEL -->
+    <div class="panel" style="border-color: var(--accent-purple); margin-bottom: 20px;">
+        <h4 style="margin-top:0; color:var(--text);">ADD NEW THREAT SIGNATURE</h4>
+        <form action="/add_hash" method="post" style="display:flex; gap:10px;">
+            <input type="text" name="file_hash" placeholder="Enter SHA-256 Hash to Blacklist..." maxlength="64" required style="flex:3;">
+            <button type="submit" style="flex:1; background: var(--accent-purple); color:white;">BLACKLIST HASH</button>
+        </form>
+    </div>
+
+    <!-- HASH TABLE -->
+    <div class="panel">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 80px;">NO.</th>
+                    <th>SHA-256 FILE HASH</th>
+                    <th style="text-align: right;">ACTION</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if hash_list %}
+                    {% for h in hash_list %}
+                    <tr style="border-bottom: 1px solid #111;">
+                        <td style="color:#555;">{{ loop.index }}</td>
+                        <td style="font-family: monospace; color: var(--accent-blue);">{{ h[1] }}</td>
+                        <td style="text-align: right;">
+                            <a href="/del_hash/{{ h[0] }}" style="color:var(--red); text-decoration:none; font-size:0.9em;" onclick="return confirm('Remove this hash from blacklist?')">Remove</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr><td colspan="3" style="text-align:center; padding:50px; color:#444;">Malware repository is empty. Add hashes manually or via VirusTotal.</td></tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+    <div style="margin-top: 20px;">
+        <a href="/?view=policy" class="nav-btn" style="width: 150px; text-align: center; background: #222;">Back to Policy</a>
+    </div>
+
+
+
+    {% elif view == 'logs' %}
+    <h2 style="margin-bottom: 25px; color: var(--accent-blue);">System Console</h2>
+    
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:25px; align-items: start;">
+        
+        <!-- LEFT COLUMN: MANAGER -->
+        <div style="display: flex; flex-direction: column;">
+            <!-- HEADER WRAPPER: Fixed height of 80px ensures perfect alignment -->
+            <div style="height: 80px; display: flex; align-items: center; border-bottom: 1px solid #222; margin-bottom: 15px;">
+                <h4 style="margin: 0; color: var(--text); letter-spacing: 1px;">MANAGER LOGS</h4>
+            </div>
+
+            <div class="terminal">
+                {% for log in m_logs %}
+                    <div style="margin-bottom: 5px;">{{ log }}</div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: AGENT -->
+        <div style="display: flex; flex-direction: column;">
+            <!-- HEADER WRAPPER: Matches the 80px height of the left side -->
+            <div style="height: 80px; display: flex; flex-direction: column; justify-content: center; border-bottom: 1px solid #222; margin-bottom: 15px;">
+                <h4 style="margin: 0 0 8px 0; color: var(--text); letter-spacing: 1px;">AGENT LOGS</h4>
+                <form method="GET" style="margin: 0;">
+                    <input type="hidden" name="view" value="logs">
+                    <select name="log_agent" onchange="this.form.submit()" style="margin: 0; padding: 5px; height: 35px; font-size: 0.85em; background: #0d1117; border-color: #333;">
+                        <option>Select Agent</option>
+                        {% for a in agents %}
+                            <option value="{{ a[0] }}" {% if request.args.get('log_agent') == a[0] %}selected{% endif %}>{{ a[0] }}</option>
+                        {% endfor %}
+                    </select>
+                </form>
+            </div>
+
+            <div class="terminal" style="border-color: #58a6ff; box-shadow: 0 0 20px rgba(88, 166, 255, 0.1);">
+                {% if a_logs %}
+                    {% for alog in a_logs %}
+                        <div style="margin-bottom: 5px; color: #58a6ff;">
+                            <span style="color: #666;">[{{ alog[0] }}]</span> {{ alog[1] }}: {{ alog[2] }}
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div style="color: #444; font-style: italic; text-align: center; margin-top: 50px;">
+                        Select an agent from the dropdown above to view logs.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+	{% elif view == 'settings' %}
+    <h2 style="color: var(--accent-blue);">System & Security Settings</h2>
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <!-- Panel 1: Manager Credentials -->
+        <div class="panel">
+            <h3 style="margin-top: 0;">🛡️ Manager Authentication</h3>
+            <p style="font-size: 0.8em; color: #888;">Update your dashboard login credentials.</p>
+            <form action="/update_settings" method="post">
+                <label style="font-size: 0.8em; color: var(--accent);">NEW USERNAME</label>
+                <input type="text" name="new_user" value="{{ session.get('user') }}" required>
+                
+                <label style="font-size: 0.8em; color: var(--accent);">NEW PASSWORD</label>
+                <input type="password" name="new_pass" placeholder="••••••••" required>
+                
+                <button type="submit" style="margin-top: 10px;">UPDATE MANAGER LOGIN</button>
+            </form>
+        </div>
+
+        <!-- Panel 2: Agent Disarm Key -->
+        <div class="panel" style="border-color: var(--orange);">
+            <h3 style="margin-top: 0; color: var(--orange);">🔑 Global Agent Shutdown Key</h3>
+            <p style="font-size: 0.8em; color: #888;">This password is synced to all agents for local disarming.</p>
+            <form action="/update_settings" method="post">
+                <label style="font-size: 0.8em; color: var(--orange);">SHUTDOWN PASSWORD</label>
+                <!-- We pull the current password from a variable we'll set in home() -->
+                <input type="text" name="new_shutdown" value="{{ shutdown_pwd }}" required>
+                
+                <button type="submit" style="background: var(--orange); color: black; margin-top: 10px;">SYNC NEW KEY TO FLEET</button>
+            </form>
+        </div>
+		<div class="panel" style="border-color: var(--red); margin-top: 20px;">
+    <h3 style="color: var(--red); margin-top: 0;">🛡️ Brute-Force Recovery Policy</h3>
+    <p style="font-size: 0.8em; color: #888;">If a user is successfully breached after 5 fails, their password will be changed to this value and the host isolated.</p>
+    <form action="/update_settings" method="post">
+        <label style="font-size: 0.8em; color: var(--red);">EMERGENCY RECOVERY PASSWORD</label>
+        <input type="text" name="new_emergency" value="{{ emergency_pwd }}" required style="border-color: var(--red); color: var(--red);">
+        <button type="submit" style="background: var(--red); color: white; margin-top: 10px;">UPDATE RECOVERY POLICY</button>
+    </form>
+</div>
+    </div>
+	{% elif view == 'shell' %}
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 15px;">
+        <h2 style="color: var(--accent-blue);">Interactive Remote PowerShell</h2>
+		<div>
+		<a href="/?view=c2" class="c2-btn">
+    <span class="icon">🛰️</span> 
+    <span>Command & Control</span>
+</a>
+        <select id="shellAgentSelector" onchange="window.location.href='/?view=shell&shell_agent='+this.value" style="width:250px; margin:0; border-color: var(--accent-blue);">
+            <option value="">Select Agent...</option>
+            {% for a in agents %}
+                <option value="{{ a[0] }}" {% if shell_agent == a[0] %}selected{% endif %}>{{ a[0] }}</option>
+			{% endfor %}
+        </select>
+		</div>
+    </div>
+
+    <div id="terminalContainer" class="panel" style="padding:0; background: transparent; border: none; position: relative;">
+        <!-- Hidden input for keyboard capture -->
+        <input type="text" id="hiddenInput" style="position:absolute; opacity:0; pointer-events:none;" autofocus>
+        
+        <div id="shellTerminal" class="terminal" style="cursor: text;">
+            <!-- History text is now white via the class -->
+            <pre id="shellHistory" style="margin:0; white-space: pre-wrap; color: #ffffff;"></pre>
+            
+            <div style="display: flex; align-items: center; margin-top: 5px;">
+                <!-- Prompt stays blue for professional look, typing is white -->
+                <span id="currentPrompt" style="font-weight:bold; color: var(--accent-blue); margin-right: 8px;">{{ current_shell_prompt }}</span>
+                <span id="cmdBuffer" style="color: #ffffff; white-space: pre;"></span>
+                <span class="cursor-blue">&nbsp;</span>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        @keyframes blink { 50% { opacity: 0; } }
+        #shellTerminal::-webkit-scrollbar { width: 8px; }
+        #shellTerminal::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+    </style>
+
+    <script>
+    let shellAgent = "{{ shell_agent }}";
+    let cmdBuffer = "";
+
+    // 1. Click Terminal to Focus hidden input
+    document.getElementById('shellTerminal').onclick = () => document.getElementById('hiddenInput').focus();
+
+    // 2. Capture Keypresses
+    document.getElementById('hiddenInput').oninput = (e) => {
+        cmdBuffer = e.target.value;
+        document.getElementById('cmdBuffer').innerText = cmdBuffer;
+    };
+
+    // 3. Handle Enter Key
+    document.getElementById('hiddenInput').onkeydown = async (e) => {
+        if (e.key === "Enter") {
+            const finalCmd = cmdBuffer;
+            cmdBuffer = "";
+            e.target.value = "";
+            document.getElementById('cmdBuffer').innerText = "";
+            
+            if(finalCmd.trim() !== "" && shellAgent !== "") {
+                const fd = new FormData();
+                fd.append('agent_id', shellAgent);
+                fd.append('cmd', finalCmd);
+                await fetch('/exec_shell', { method: 'POST', body: fd });
+            }
+        }
+    };
+
+    // 4. Sync History and Prompt every 2 seconds
+    if (shellAgent && shellAgent !== "None" && shellAgent !== "") {
+        setInterval(async () => {
+            try {
+                let r = await fetch('/api/get_shell?agent_id=' + shellAgent);
+                let d = await r.json();
+                document.getElementById('shellHistory').innerText = d.history;
+                document.getElementById('currentPrompt').innerText = d.prompt;
+                
+                // Auto-scroll to bottom
+                const term = document.getElementById('shellTerminal');
+                term.scrollTop = term.scrollHeight;
+            } catch (e) { }
+        }, 2000);
+    }
+</script>
+{% elif view == 'c2' %}
+    <h2 style="color: var(--accent-blue);">🛰️ Fleet Command & Control (C2)</h2>
+    <form action="/exec_bulk" method="post" id="c2Form" enctype="multipart/form-data">
+        <div style="display:flex; gap:20px; height: 75vh; align-items: stretch;">
+            
+            <!-- LEFT PANEL: AGENT SELECTION -->
+            <div class="panel" style="flex: 1; overflow-y: auto; border-color: #333;">
+                <h4 style="margin-top:0;">AGENT FLEET</h4>
+                <div style="margin-bottom:15px; border-bottom:1px solid #222; padding-bottom:10px;">
+                    <label style="cursor:pointer; color:var(--accent-blue);">
+                        <input type="checkbox" onclick="toggleAll(this)" style="width:auto; margin-right:10px;"> SELECT ALL AGENTS
+                    </label>
+                </div>
+				{% for a in agents %}
+                <div style="padding:10px; border-bottom:1px solid #111; display:flex; align-items:center; gap:10px;">
+                    <input type="checkbox" name="selected_agents" value="{{ a[0] }}" class="agent-check" style="width:auto;">
+                    
+                    <!-- SAFE STATUS ICON LOGIC -->
+                    {% if a[0] in fleet_results %}
+                        {% if fleet_results[a[0]].status == 'in_flight' %}
+                            <span style="color:var(--accent-blue); animation: blink 1s infinite;" title="Command sending...">📡</span>
+                        {% elif fleet_results[a[0]].status == 'success' %}
+                            <span style="color:var(--green);" title="Command successful">✅</span>
+                        {% else %}
+                            <span style="color:{{ 'var(--green)' if a[4] == 'Active' else 'var(--red)' }}">●</span>
+                        {% endif %}
+                    {% else %}
+                        <!-- Default dot if no bulk command sent yet -->
+                        <span style="color:{{ 'var(--green)' if a[4] == 'Active' else 'var(--red)' }}">●</span>
+                    {% endif %}
+                    
+                    <b style="font-size:0.9em;">{{ a[0] }}</b>
+                </div>
+                {% endfor %}
+				</div>
+
+            <!-- RIGHT PANEL: BROADCAST CENTER -->
+            <div style="flex: 2; display:flex; flex-direction:column; gap:15px;">
+                
+              <!--  <!-- 1. Script Library
+                <div class="panel" style="margin:0;">
+                    <h4 style="margin-top:0; color:var(--orange);">QUICK-ACTION SCRIPTS</h4>
+                    <select onchange="document.getElementById('c2Cmd').value = this.value" style="border-color:var(--orange);">
+                        <option value="">Select a Pre-made Fix...</option>
+                        {% for name, script in c2_scripts.items() %}
+                            <option value="{{ script }}">{{ name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>-->
+				<div class="panel" style="margin:0; border-color: var(--accent-blue);">
+        <h4 style="margin-top:0; color:var(--accent-blue);">⚡ HYBRID DEPLOYMENT</h4>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+            <!-- Option A: Internet URL -->
+            <div>
+                <label style="font-size:0.7em; color:#888;">DOWNLOAD FROM INTERNET (URL)</label>
+                <input type="text" name="file_url" placeholder="https://site.com/tool.exe" style="margin:0;">
+            </div>
+            <!-- Option B: Local Upload -->
+            <div>
+                <label style="font-size:0.7em; color:#888;">UPLOAD FROM THIS PC TO MANAGER</label>
+                <input type="file" name="local_file" style="margin:0; padding:5px; font-size:0.8em; border-style:dashed;">
+            </div>
+        </div>
+        <div style="display:flex; gap:10px; margin-top:10px;">
+            <select onchange="document.getElementById('c2Cmd').value = this.value" style="flex:1; margin:0;">
+                <option value="">Select Script...</option>
+                {% for name, script in c2_scripts.items() %}
+                    <option value="{{ script }}">{{ name }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" name="action_type" value="FILE_PUSH" style="flex:1; background:var(--accent-blue); color:black;">🚀 INITIALIZE DEPLOYMENT</button>
+        </div>
+    </div>
+				  <!-- 2. Command Broadcast -->
+                <div class="panel" style="flex:1; margin:0; display:flex; flex-direction:column; border-color:var(--accent-green);">
+                    <h4 style="margin-top:0; color:var(--accent-green);">MASS POWERSHELL EXECUTION</h4>
+                    <textarea name="cmd" id="c2Cmd" style="flex:1; background:#000; color:white; border:1px solid #333; padding:15px; font-family:monospace; margin-bottom:10px; border-radius:5px;" placeholder="Type PowerShell command here..."></textarea>
+                    
+                    <div style="display:flex; gap:10px;">
+                        <button type="submit" name="action_type" value="SHELL" style="flex:2; background:var(--green); color:black;">🚀 BROADCAST COMMAND</button>
+						<button type="button" onclick="openResultsPanel()" style="flex:1; background:var(--accent-purple); color:white; border: 1px solid rgba(255,255,255,0.2);">
+        📊 VIEW LIVE RESULTS
+    </button>
+                        <button type="submit" name="action_type" value="ISOLATE" 
+                style="flex:1; background:var(--red); {% if fleet_lockdown %} opacity: 0.3; pointer-events: none; grayscale(1); {% endif %}" 
+                onclick="return confirm('WARNING: This will isolate ALL selected hosts. Proceed?')">
+                ☢️ NUCLEAR ISOLATE
+        </button>
+
+        <!-- NUCLEAR RESTORE: Disabled if lockdown is NOT active -->
+        <button type="submit" name="action_type" value="RESTORE" 
+                style="flex:1; background:var(--accent-blue); color:black; {% if not fleet_lockdown %} opacity: 0.3; pointer-events: none; grayscale(1); {% endif %}">
+                🟢 NUCLEAR RESTORE
+        </button>
+						<!--<button type="submit" name="action_type" value="ISOLATE" style="flex:1; background:var(--red);" onclick="return confirm('WARNING: This will isolate ALL selected hosts. Proceed?')">☢️ NUCLEAR ISOLATION</button>-->
+                    </div>
+                </div>
+			</div>
+		</div>
+    </form>
+	    <script>
+        function toggleAll(master) {
+            const checks = document.querySelectorAll('.agent-check');
+            checks.forEach(c => c.checked = master.checked);
+        }
+		let resultsInterval = null;
+
+function openResultsPanel() {
+    document.getElementById('resultsPanel').classList.add('active');
+    // Start refreshing results every 3 seconds
+    refreshResults();
+    resultsInterval = setInterval(refreshResults, 3000);
+}
+
+function closeResultsPanel() {
+    document.getElementById('resultsPanel').classList.remove('active');
+    clearInterval(resultsInterval);
+}
+
+async function refreshResults() {
+    try {
+        let r = await fetch('/api/get_bulk_results');
+        let data = await r.json();
+        let container = document.getElementById('resultsContent');
+        
+        if (Object.keys(data).length === 0) return;
+        
+        let html = "";
+        for (let aid in data) {
+            // This structure recreates Image 1 perfectly
+            html += `
+                <div class="agent-result-card">
+                    <div class="agent-name-row">
+                        <span style="font-size:1.2em;">💻</span>
+                        <b style="letter-spacing:1px;">${aid}</b>
+                    </div>
+                    <div class="result-terminal">${data[aid]}</div>
+                </div>`;
+        }
+        container.innerHTML = html;
+    } catch (e) { console.error("Result fetch error", e); }
+}
+    </script>
+	<div id="resultsPanel" class="nebula-side-panel">
+    <div class="panel-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:1px solid #333; padding-bottom:15px;">
+        <h3 style="margin:0; color:var(--accent-blue); letter-spacing:1px;">📊 LIVE BROADCAST FEED</h3>
+        <button onclick="closeResultsPanel()" style="width:auto; padding:5px 12px; background:var(--red); color:white; border-radius:4px; font-weight:bold;">X</button>
+    </div>
+    
+    <div id="resultsContent" style="overflow-y:auto; flex:1;">
+        <!-- Results populated via JS -->
+        <p style="color:#666; text-align:center; margin-top:50px;">Waiting for agent responses...</p>
+    </div>
+</div>
+{% elif view == 'rules' %}
+    <h2 style="color: var(--accent-blue);">⚖️ Operational Policy & Response</h2>
+    <p style="color:#666; font-size:0.9em;">Define automated actions for critical threat events.</p>
+
+    <!-- RULE 1: RANSOMWARE & BRUTE FORCE -->
+    <div class="panel" style="border-left: 5px solid var(--red); margin-top: 20px;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div style="flex: 2;">
+                <h3 style="margin:0; color:var(--red);">Brute-Force Active Response</h3>
+                <p style="font-size:0.85em; color:#888; margin-top:5px;">
+                    <b>Trigger:</b>4+ Failed Logins followed by Success within 120s.<br>
+                    <b>Action:</b> <span style="color:var(--accent-blue);">ISOLATE HOST</span> + <span style="color:var(--accent-blue);">TERMINATE SESSION</span> + <span style="color:var(--accent-blue);">RESET CREDENTIALS</span>
+                </p>
+            </div>
+<div style="flex: 1; text-align: right;">
+    <!-- We check the status we just fetched in manager.py -->
+    {% if auto_remediate_status == "ON" %}
+        <a href="/toggle_rule/auto_remediate/OFF" class="nav-btn" style="background:var(--red); text-align:center; color:white; width:170px; display:inline-block;">
+            🔴 DEACTIVATE RULE
+        </a>
+    {% else %}
+        <a href="/toggle_rule/auto_remediate/ON" class="nav-btn" style="background:var(--green); text-align:center; color:black; width:170px; display:inline-block;">
+            🟢 ACTIVATE RULE
+        </a>
+    {% endif %}
+</div>
+        </div>
+    </div>
+
+
+ {% elif view == 'ip_intel' %}
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2>Global Threat Intelligence Cache</h2>
+            <span style="font-size: 0.8em; color: #888;">POWERED BY AbuseIPDB</span>
+        </div>
+        
+        <div class="panel">
+            <table>
+                <thead>
+                    <tr><th>IP ADDRESS</th><th>THREAT DESCRIPTION</th><th>ABUSE SCORE</th><th>LAST CHECKED</th></tr>
+                </thead>
+               <tbody>
+                    {% for item in intel %}
+                    <tr onclick="window.open('https://www.abuseipdb.com/check/{{ item[0] }}', '_blank')" style="cursor: pointer;" title="Click to view details on AbuseIPDB">
+                        <td style="color: var(--accent-blue); font-weight: bold;">🌐 {{ item[0] }}</td>
+                        <td>{{ item[2] }}</td>
+                        <td style="color: {{ 'var(--red)' if item[1] > 75 else 'var(--orange)' }}">
+                            <b>{{ item[1] }}%</b>
+                        </td>
+                        <td style="color: #666; font-size: 0.85em;">{{ item[3] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div style="margin-top: 20px;">
+            <a href="/?view=policy" class="nav-btn" style="width: 150px; text-align: center; background: #333; text-decoration: none; display: inline-block;">Back to Policy</a>
+        </div>
+{% endif %}
+    {% if browser_data %}
+    <!-- DYNAMIC BROWSER SECTION (FIXED: Uses ['items'] bracket notation) -->
+    <div class="panel" style="margin-top:20px; border-color: var(--accent);">
+        <h3>📂 Explorer: {{ b_agent }} ({{ browser_data['path'] }})</h3>
+        <div class="file-list">
+            {% for item in browser_data['items'] %}
+            <div class="file-item" onclick="browsePath('{{ (browser_data['path'] + item['name'] + '\\') | replace('\\', '\\\\') }}', '{{ item['is_dir'] }}')">
+                <span>{{ '📁' if item['is_dir'] else '📄' }} {{ item['name'] }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- BROWSER MODAL -->
+<div id="browserModal" class="modal">
+    <div class="modal-content">
+        <div style="display:flex; justify-content:space-between; margin-bottom:15px;"><h3>Remote Explorer</h3><button onclick="closeBrowser()" style="width:40px; background:var(--red)">X</button></div>
+        <div style="display:flex; gap:10px; margin-bottom:10px;"><button onclick="goBack()" style="width:80px; background:#444">BACK</button><button onclick="browsePath('ROOT')" style="width:80px; background:#444">DRIVES</button><div id="pathDisp" style="flex:1; background:#000; padding:10px; color:var(--green); font-family:monospace; border-radius:4px; font-size:0.85em;">ROOT</div></div>
+        <div id="fileList" class="file-list"></div>
+    </div>
+</div>
+<div id="scanModal" class="modal"><div class="modal-content"><h2 style="color:var(--green);">✅ Scan Complete</h2><p id="reportText"></p><button onclick="document.getElementById('scanModal').style.display='none'">CLOSE</button></div></div>
+
+<script>
+let curAgent = "", curPath = "ROOT", isBrowsing = false, scanStartTime = 0;
+
+// 1. Browser Logic
+function openBrowser(aid) { 
+    curAgent = aid; 
+    isBrowsing = true; 
+    document.getElementById('browserModal').style.display = 'block'; 
+    browsePath("ROOT"); 
+}
+
+function closeBrowser() { 
+    isBrowsing = false; 
+    document.getElementById('browserModal').style.display = 'none'; 
+}
+
+async function browsePath(p) {
+    curPath = p; 
+    document.getElementById('pathDisp').innerText = p;
+    document.getElementById('fileList').innerHTML = "<p style='text-align:center; padding:20px;'>Fetching data from agent...</p>";
+    await fetch(`/request_browse?agent_id=${curAgent}&path=${encodeURIComponent(p)}`);
+    poll();
+}
+
+// 1. Updated Poll function to show OPEN and SELECT buttons
+async function poll() {
+    if (!isBrowsing) return;
+    let r = await fetch(`/api/browser_data?agent_id=${curAgent}`);
+    let d = await r.json();
+    
+    if (d.path === curPath) {
+        let h = "";
+        d.items.forEach(i => {
+            // Rebuild the full path correctly
+            let full = "";
+            if (curPath === "ROOT") {
+                full = i.name;
+            } else {
+                let base = curPath.endsWith('\\') ? curPath : curPath + '\\';
+                full = base + i.name;
+            }
+            let safe = full.replace(/\\/g, '\\\\');
+
+            // Generate HTML with OPEN and SELECT buttons
+            h += `
+            <div class="file-item" style="display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid #222;">
+                <span>${i.is_dir ? '📁' : '📄'} ${i.name}</span>
+                <div style="display:flex; gap:10px;">
+                    ${i.is_dir ? `<button onclick="browsePath('${safe}')" style="width:70px; background:#444; padding:5px; font-size:0.75em; margin:0;">OPEN</button>` : ''}
+                    <button onclick="selectPath('${safe}')" style="width:70px; background:var(--green); color:black; padding:5px; font-size:0.75em; margin:0;">SELECT</button>
+                </div>
+            </div>`;
+        });
+        document.getElementById('fileList').innerHTML = h;
+    } else { 
+        setTimeout(poll, 2000); 
+    }
+}
+
+// 2. This function puts the path into your "manual_path" input box
+function selectPath(p) {
+    const pathInput = document.getElementById('manual_path');
+    if (pathInput) {
+        pathInput.value = p;
+        closeBrowser();
+        // Optional: brief visual feedback
+        pathInput.style.borderColor = 'var(--green)';
+        setTimeout(() => { pathInput.style.borderColor = 'var(--border)'; }, 1000);
+    }
+}
+
+//async function initiateScan(p) {
+  //  if (!confirm("Start full EDR scan on " + p + "?")) return;
+    //closeBrowser();
+    
+    // UI Notification
+    //alert("Scan successfully started on " + curAgent);
+    
+    //const fd = new FormData();
+    //fd.append('agent_id', curAgent);
+    //fd.append('scan_path', p);
+    //await fetch('/trigger_scan', { method: 'POST', body: fd });
+    
+    // Initialize Progress Bar
+    //scanStartTime = Date.now();
+    //localStorage.setItem('isScanning', 'true');
+    //localStorage.setItem('scanStart', scanStartTime);
+//}
+async function startScan(p) {
+    // Standardize Agent Selection
+    const aid = document.getElementById('target_aid').value;
+    if(!aid) return alert("Select an Agent.");
+    if(!p || p.trim() === "") return alert("Please select a path using the BROWSE button.");
+
+    const formData = new FormData(); 
+    formData.append('agent_id', aid); 
+    formData.append('scan_path', p);
+    
+    try {
+        const response = await fetch('/trigger_scan', { method: 'POST', body: formData });
+        if(response.ok) {
+            // SET UP PROGRESS BAR KEYS
+            const now = Date.now();
+            localStorage.setItem('scanStartTime', now);
+            localStorage.setItem('isScanning', 'true');
+            startTime = now; // Update local variable for immediate UI update
+
+            alert("SUCCESS: Scan initiated on " + aid);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    } catch(e) { alert("Error connecting to Manager."); }
+}
+
+
+// 2. Progress Bar Sync
+setInterval(async () => {
+    let r = await fetch('/api/scan_status');
+    let data = await r.json();
+    let bar = document.getElementById('scanProgressBar');
+    let aid = Object.keys(data)[0];
+
+    if (aid && bar) {
+        bar.style.display = 'block';
+        let start = localStorage.getItem('scanStart') || Date.now();
+        let elapsed = Math.floor((Date.now() - start) / 1000);
+        
+        document.getElementById('progAgent').innerText = aid;
+        document.getElementById('progPercent').innerText = data[aid].percent + "%";
+        document.getElementById('progFill').style.width = data[aid].percent + "%";
+        document.getElementById('progPath').innerText = data[aid].path;
+        document.getElementById('progTime').innerText = "Elapsed: " + elapsed + "s";
+    } else if (bar) {
+        bar.style.display = 'none';
+        localStorage.removeItem('isScanning');
+        localStorage.removeItem('scanStart');
+    }
+}, 2000);
+
+// 3. Scan Reports
+setInterval(async () => {
+    let r = await fetch('/get_report'); let d = await r.json();
+    if (d.agent) {
+        document.getElementById('reportText').innerHTML = `<b>Agent:</b> ${d.agent}<br><b>Files:</b> ${d.total}<br><b>Quarantined:</b> ${d.quar}<br><b>Duration:</b> ${d.time}`;
+        document.getElementById('scanModal').style.display = 'block';
+    }
+}, 5000);
+
+// 4. Smart Refresh (Stops if popup is open or scanning)
+//setInterval(() => {
+  //  let scanning = localStorage.getItem('isScanning') === 'true';
+    //if (!isBrowsing && !scanning) {
+      //  location.reload();
+    //}
+//}, 20000);
+
+// --- 4. SMART REFRESH ENGINE (Restricted to specific views only) ---
+setInterval(() => {
+    // 1. Get the current view name from your Manager's Python code
+    const currentView = "{{ view }}"; 
+
+    // 2. The Whitelist: Only these 3 views are allowed to refresh
+    const allowedToRefresh = ['alerts', 'event_details', 'summary'];
+
+    // 3. Check if a scan is currently running in the background
+    let isScanning = localStorage.getItem('isScanning') === 'true';
+
+    // 4. THE SMART LOGIC:
+    // Only reload if the current page is in our whitelist
+    // AND if you are NOT currently browsing files (isBrowsing)
+    // AND if no active scan is running (isScanning)
+    if (allowedToRefresh.includes(currentView) && !isBrowsing && !isScanning) {
+        console.log("[EDR] Refreshing authorized view: " + currentView);
+        location.reload();
+    } else {
+        // This stops the refresh for: active_scan, usb, policy, logs, shell, and c2
+        // console.log("[EDR] Refresh blocked for protected view: " + currentView);
+    }
+}, 35000); // 15 Seconds
+
+function goBack() {
+    if (curPath === "ROOT") return;
+    let pts = curPath.split('\\').filter(x => x.length > 0);
+    pts.pop();
+    browsePath(pts.length ? pts.join('\\') + '\\' : 'ROOT');
+}
+</script>
+<!--setInterval(() => { 
+    // Do NOT refresh if we are using the Shell OR Browsing
+    const view = "{{ view }}";
+    if(!isBrowsing && view !== 'shell') {
+        location.reload(); 
+    }
+}, 15000);
+</script>-->
+
+</body>
+</html>

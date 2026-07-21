@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - EDR DEFENDER</title>
+    <style>
+        :root {
+            --bg: #000000;
+            --accent-green: #39ff14; /* Lime Green */
+            --accent-blue: #00f2ff;  /* Cyber Blue */
+            --glow-mix: rgba(0, 242, 255, 0.3);
+            --grid-blue: rgba(0, 242, 255, 0.1);
+            --grid-green: rgba(57, 255, 20, 0.1);
+        }
+
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0; 
+            height: 100vh; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            background-color: var(--bg);
+            /* THE MIXED GRID LOGIC */
+            background-image: 
+                linear-gradient(var(--grid-blue) 1px, transparent 1px), /* Horizontal Blue */
+                linear-gradient(90deg, var(--grid-green) 1px, transparent 1px), /* Vertical Green */
+                radial-gradient(circle at center, #061212 0%, #000000 100%); /* Deep Central Glow */
+            background-size: 45px 45px, 45px 45px, 100% 100%;
+            overflow: hidden;
+        }
+
+        .login-card { 
+            background: rgba(8, 10, 10, 0.95); 
+            padding: 50px 40px; 
+            border-radius: 15px; 
+            width: 380px; 
+            text-align: center; 
+            /* Initial border and shadow */
+            border: 1px solid var(--accent-blue);
+            box-shadow: 0 0 40px #000, 0 0 20px var(--glow-mix);
+            
+            /* Glassmorphism effect */
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            
+            /* NEON SHIFT ANIMATION: Colors pulse between Green and Blue */
+            animation: neonShift 6s infinite alternate ease-in-out;
+            position: relative;
+            z-index: 10;
+        }
+
+        @keyframes neonShift {
+            0% { 
+                border-color: var(--accent-blue); 
+                box-shadow: 0 0 20px rgba(0, 242, 255, 0.4); 
+            }
+            100% { 
+                border-color: var(--accent-green); 
+                box-shadow: 0 0 20px rgba(57, 255, 20, 0.4); 
+            }
+        }
+
+        .logo { 
+              width: 160px; /* Increased from 100px */
+              margin-bottom: 20px; /* Slightly increased for better spacing */
+              /* Glow behind logo */
+              filter: drop-shadow(0 0 20px var(--accent-blue)); /* Enhanced glow for the larger size */
+              transition: 0.5s;
+              }
+
+        h2 { 
+            color: var(--accent-green); 
+            margin-bottom: 35px; 
+            text-transform: uppercase; 
+            letter-spacing: 5px; 
+            font-size: 1.7em;
+            font-weight: 900;
+            /* Green text with Blue shadow for the 'mixed' look */
+            text-shadow: 0 0 15px var(--accent-blue);
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        input { 
+            width: 100%; 
+            padding: 14px; 
+            background: rgba(0, 0, 0, 0.7); 
+            border: 1px solid #222; 
+            color: white; 
+            border-radius: 8px; 
+            box-sizing: border-box; 
+            transition: 0.3s;
+            font-size: 1em;
+            letter-spacing: 1px;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 15px rgba(0, 242, 255, 0.3);
+            background: #000;
+        }
+
+        button { 
+            width: 100%; 
+            padding: 14px; 
+            /* Mixed Gradient Button */
+            background: linear-gradient(45deg, var(--accent-green), var(--accent-blue));
+            border: none; 
+            color: #000; 
+            font-weight: 900; 
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-size: 1em; 
+            transition: 0.3s;
+            margin-top: 10px;
+            box-shadow: 0 0 15px rgba(0, 242, 255, 0.4);
+        }
+
+        button:hover { 
+            transform: scale(1.03);
+            filter: brightness(1.2);
+            box-shadow: 0 0 25px var(--accent-green);
+        }
+
+        .error { 
+            color: #ff3131; 
+            font-size: 0.85em; 
+            margin-bottom: 20px; 
+            background: rgba(255, 49, 49, 0.1);
+            padding: 10px;
+            border: 1px solid #ff3131;
+            border-radius: 5px;
+            animation: shake 0.3s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .footer-text {
+            margin-top: 30px;
+            font-size: 0.65em;
+            color: #333;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-card">
+        <!-- Logo Image -->
+        <img src="{{ url_for('static', filename='image3s.png') }}" class="logo" alt="EDR Logo">
+        
+        <h2>EDR DEFENDER</h2>
+        
+        <!-- Error Handling -->
+        {% if error %}
+            <div class="error">ACCESS DENIED: {{ error }}</div>
+        {% endif %}
+        
+        <form method="POST">
+            <div class="input-group">
+                <input type="text" name="username" placeholder="OPERATOR ID" required autocomplete="off">
+            </div>
+            <div class="input-group">
+                <input type="password" name="password" placeholder="SECURITY KEY" required>
+            </div>
+            <button type="submit">INITIALIZE ACCESS</button>
+        </form>
+        
+        <div class="footer-text">
+            SECURE TERMINAL // ENCRYPTED SESSION
+        </div>
+    </div>
+
+</body>
+</html>

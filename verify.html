@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>2FA Verification - EDR DEFENDER</title>
+    <style>
+        :root {
+            --bg: #000000;
+            --accent-green: #39ff14;
+            --accent-blue: #00f2ff;
+            --glow-mix: rgba(0, 242, 255, 0.3);
+            --grid-blue: rgba(0, 242, 255, 0.1);
+            --grid-green: rgba(57, 255, 20, 0.1);
+        }
+
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            margin: 0; height: 100vh; display: flex; 
+            justify-content: center; align-items: center; 
+            background-color: var(--bg);
+            background-image: 
+                linear-gradient(var(--grid-blue) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-green) 1px, transparent 1px),
+                radial-gradient(circle at center, #061212 0%, #000000 100%);
+            background-size: 45px 45px, 45px 45px, 100% 100%;
+        }
+
+        .login-card { 
+            background: rgba(8, 10, 10, 0.95); 
+            padding: 50px 40px; border-radius: 15px; 
+            width: 380px; text-align: center; 
+            border: 1px solid var(--accent-blue);
+            box-shadow: 0 0 40px #000, 0 0 20px var(--glow-mix);
+            backdrop-filter: blur(10px);
+            animation: neonShift 6s infinite alternate ease-in-out;
+        }
+
+        @keyframes neonShift {
+            0% { border-color: var(--accent-blue); }
+            100% { border-color: var(--accent-green); }
+        }
+
+        h2 { color: var(--accent-green); text-transform: uppercase; letter-spacing: 5px; text-shadow: 0 0 15px var(--accent-blue); }
+
+        input { 
+            width: 100%; padding: 14px; background: rgba(0, 0, 0, 0.7); 
+            border: 1px solid #222; color: white; border-radius: 8px; 
+            text-align: center; font-size: 1.5em; letter-spacing: 5px; /* Reduced spacing slightly to fit 6 digits */
+        }
+
+        input:focus { outline: none; border-color: var(--accent-blue); }
+
+        button { 
+            width: 100%; padding: 14px; margin-top: 20px;
+            background: linear-gradient(45deg, var(--accent-green), var(--accent-blue));
+            border: none; color: #000; font-weight: bold; 
+            text-transform: uppercase; letter-spacing: 2px; border-radius: 8px; cursor: pointer;
+        }
+
+        .error { color: #ff3131; margin-bottom: 20px; font-size: 0.9em; }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <h2>VERIFY IDENTITY</h2>
+        <!-- UPDATED TO 6-DIGIT -->
+        <p style="color: #666; font-size: 0.8em; margin-bottom: 20px;">ENTER THE 6-DIGIT CODE SENT TO YOUR EMAIL</p>
+        
+        {% if error %}<div class="error">{{ error }}</div>{% endif %}
+        
+        <form method="POST">
+            <!-- UPDATED Placeholder and MaxLength -->
+            <input type="text" name="otp" placeholder="000000" maxlength="6" required autocomplete="off" autofocus>
+            <button type="submit">AUTHORIZE SESSION</button>
+        </form>
+        
+        <p style="margin-top: 20px;"><a href="/logout" style="color: #444; font-size: 0.7em; text-decoration: none;">CANCEL REQUEST</a></p>
+    </div>
+</body>
+</html>
