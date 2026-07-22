@@ -261,34 +261,11 @@ def query_nvd_for_app(app_name, app_version):
     
     return []
 
-    # Clean the receiver email just in case
-   # receiver_email = receiver_email.strip()
-
-    # Use a standard MIME format to prevent the "Address Not Found" glitch
-    #from email.mime.text import MIMEText
-    #from email.mime.multipart import MIMEMultipart
-
-    #msg = MIMEMultipart()
-    #msg['From'] = f"EDR Defender <{sender_email}>"
-    #msg['To'] = receiver_email
-    #msg['Subject'] = "EDR Defender - 2FA Access Code"
-
-    #body = f"Your secure access code is: {code}\n\nThis code will expire in 5 minutes.\nUnauthorized access attempts are logged."
-    #msg.attach(MIMEText(body, 'plain'))
-
-    #context = ssl.create_default_context()
-    #try:
-     #   with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
-      #      server.login(sender_email, password)
-       #     server.sendmail(sender_email, receiver_email, msg.as_string())
-        #return True
-    #except Exception as e:
-        #logger.error(f"Email System Error: {e}")
-        #return False
+    
 def send_security_email(receiver_email, pin, agent_id):
     """Refined SMTP system to authorize EDR shutdown."""
-    sender_email = "uusmanzammad@gmail.com"
-    password = "ifmu maah sgoz wbad" 
+    sender_email = "add your own email"
+    password = "add your own password" 
     
     msg = MIMEMultipart()
     msg['From'] = f"EDR DEFENDER CORE <{sender_email}>"
