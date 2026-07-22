@@ -132,7 +132,7 @@ begin
 
     if PwdForm.ShowModal() = mrOk then
     begin
-      if UninstallPwdEdit.Text = '12121234@Usman' then
+      if UninstallPwdEdit.Text = 'add your own password' then
         Result := True
       else
         MsgBox('INVALID KEY. Uninstallation blocked.', mbCriticalError, MB_OK);
