@@ -1,10 +1,6 @@
 # OneDefend-Advanced-gRPC-Powered-Endpoint-Detection-Response-Platform
 A high-performance, real-time EDR system built on gRPC, featuring kernel-level anti-tamper, automated ransomware containment, and visual root-cause analysis.
 
-This is a comprehensive Research Paper / Technical Whitepaper draft for your
-project. I have structured it in the standard IEEE/Academic format, which is
-exactly what you need for a career-level publication or a university thesis.
-
 OneDefend: A High-Performance gRPC-Powered EDR Framework with Multi-Layered Anti-Tamper and Automated Remediation
 
 Author: Muhammad Usman
